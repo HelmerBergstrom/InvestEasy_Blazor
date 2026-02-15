@@ -11,23 +11,23 @@
     <nav class="nav-links">
         <div class="nav-item px-3">
             <NavLink href="/" class="nav-link" Match="NavLinkMatch.All" ActiveClass="active">
-                Hem
+                Home
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
             <NavLink href="/education" class="nav-link" ActiveClass="active">
-                Utbildning
+                Education
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink href="/savingCalc" class="nav-link" ActiveClass="active">
-                Sparkalkylator
+            <NavLink href="/riskProfile" class="nav-link" ActiveClass="active">
+                Risk Profile
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink href="/riskProfile" class="nav-link" ActiveClass="active" aria-hidden="true">
-                Riskprofil
+            <NavLink href="/savingCalc" class="nav-link" ActiveClass="active" aria-hidden="true">
+                Saving Calculator
             </NavLink>
         </div>
 
@@ -36,7 +36,7 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Manage">
-                        @context.User.Identity?.Name
+                        Profile
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">

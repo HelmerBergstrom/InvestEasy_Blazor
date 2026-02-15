@@ -3,7 +3,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 1rem 2rem;
-    background-color: #1e293b;
+    background: linear-gradient(135deg, #1e293b 0%, #2c3d57 50%, #243447 100%);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     position: sticky;
     top: 0;
@@ -42,16 +42,14 @@
 
 .nav-item ::deep {
     border-radius: 10px;
-    background-color: #2a3951;
 }
 
 .nav-item ::deep a.active {
-    color: rgb(46, 206, 46);
+    color: rgb(39, 172, 39);
 }
 
 .nav-item ::deep .nav-link:hover {
-    color: rgb(46, 206, 46);
-    background-color: rgba(0, 0, 0, 0.052);
+    color: rgb(39, 172, 39);
 }
 
 @media (max-width: 1100px) {

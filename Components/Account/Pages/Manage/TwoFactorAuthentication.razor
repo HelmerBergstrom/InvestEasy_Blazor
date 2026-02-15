@@ -20,7 +20,8 @@
         {
             <div class="alert alert-danger">
                 <strong>You have no recovery codes left.</strong>
-                <p>You must <a href="Account/Manage/GenerateRecoveryCodes">generate a new set of recovery codes</a> before you can log in with a recovery code.</p>
+                <p>You must <a href="Account/Manage/GenerateRecoveryCodes">generate a new set of recovery codes</a> before you can
+                    log in with a recovery code.</p>
             </div>
         }
         else if (recoveryCodesLeft == 1)
@@ -50,7 +51,7 @@
         <a href="Account/Manage/GenerateRecoveryCodes" class="btn btn-primary">Reset recovery codes</a>
     }
 
-    <h4>Authenticator app</h4>
+    <h4 style="color: white; margin-top: 20px;">Authenticator app</h4>
     @if (!hasAuthenticator)
     {
         <a href="Account/Manage/EnableAuthenticator" class="btn btn-primary">Add authenticator app</a>
@@ -100,7 +101,7 @@ else
         await SignInManager.ForgetTwoFactorClientAsync();
 
         RedirectManager.RedirectToCurrentPageWithStatus(
-            "The current browser has been forgotten. When you login again from this browser you will be prompted for your 2fa code.",
-            HttpContext);
+        "The current browser has been forgotten. When you login again from this browser you will be prompted for your 2fa code.",
+        HttpContext);
     }
 }
