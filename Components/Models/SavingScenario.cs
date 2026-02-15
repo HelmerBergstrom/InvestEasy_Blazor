@@ -25,5 +25,6 @@ public class SavingScenarioModel
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
     // FK
+    [Required]
     public string UserId { get; set; } = string.Empty;
 }
