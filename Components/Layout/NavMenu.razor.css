@@ -46,14 +46,15 @@
 }
 
 .nav-item ::deep a.active {
-    text-decoration: underline;
+    color: rgb(46, 206, 46);
 }
 
 .nav-item ::deep .nav-link:hover {
-    text-decoration: underline;
+    color: rgb(46, 206, 46);
+    background-color: rgba(0, 0, 0, 0.052);
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1100px) {
     .logo {
         position: absolute;
         top: 16px;
