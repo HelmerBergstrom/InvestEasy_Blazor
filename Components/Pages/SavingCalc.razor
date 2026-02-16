@@ -1,50 +1,116 @@
-@page "/SavingCalc"
+@page "/savingcalc"
+@rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 
+@using InvestEasy.Models
 @using InvestEasy.Services
 @inject ISavingCalculatorService CalculatorService
-
-@using InvestEasy.Models
 
 <PageTitle> Saving Calculator </PageTitle>
 
 <h1> Saving Calculator </h1>
 
-<div class="savings-calculator">
+<div class="savings-calculator" style="color: white;">
     <div class="calculator-card">
-        <div class="input-group">
-            <label> Monthly savings (kr)</label>
-            <input type="number" class="form-input" @bind="monthlyAmount" min="0" max="100000" step="100" />
+
+        <!-- Enhance = false to prevent site reloading. -->
+        <EditForm Model="@model" OnValidSubmit="Calculate" Enhance="false" FormName="SavingCalculatorForm">
+            <DataAnnotationsValidator />
+
+            <!-- Error-messages in summary (in a list) -->
+            <ValidationSummary />
+
+            <div class="input-group">
+                <label for="name"> Saving scenario name </label>
+                <InputText id="name" class="form-control" @bind-Value="model.Name" />
+            </div>
+
+            <div class="input-group">
+                <label for="monthly"> Monthly savings </label>
+                <InputNumber id="monthly" class="form-control" @bind-Value="model.MonthlyAmount" />
+            </div>
+
+            <div class="input-group">
+                <label for="initial"> Initial amount </label>
+                <InputNumber id="initial" class="form-control" @bind-Value="model.InitialAmount" />
+            </div>
+
+            <div class="input-group">
+                <label for="years"> Saving horizon (years)</label>
+                <InputNumber id="years" class="form-control" @bind-Value="model.SavingHorizon" />
+            </div>
+
+            <div class="input-group">
+                <label for="return"> Expected yearly return (%)</label>
+                <InputNumber id="return" class="form-control" @bind-Value="model.ExpectedReturnPercent" />
+            </div>
+
+            <button type="submit" class="btn btn-success"> Calculate </button>
+            <button type="reset" class="btn btn-danger"> Clear form </button>
+        </EditForm>
+
+        <div class="result-hint">
+            <p>
+                The calculation assumes monthly compound interest based on stated annual return.
+            </p>
         </div>
 
-        <div class="input-group">
-            <label> Initial amount (kr) </label>
-            <input type="number" class="form-input" @bind="initialAmount" min="0" max="10000000" step="1000" />
-        </div>
+        <!-- If hasCalculated turns true, display results -->
+        @if (hasCalculated)
+        {
+            <div class="result-box">
+                <h3> Results </h3>
 
-        <div class="input-group">
-            <label> Time (years) </label>
-            <input type="number" class="form-input" @bind="years" min="1" max="50" step="1" />
-        </div>
+                @if (!string.IsNullOrWhiteSpace(model.Name))
+                {
+                    <p><strong> Saving scenario:</strong> @model.Name</p>
+                }
 
-        <div class="input-group">
-            <label> Expected return on investment per year (%)</label>
-            <input type="number" class="form-input" @bind="expectedReturnPercent" min="0" max="20" step="0.1" />
-        </div>
+                <p><strong> Future value:</strong> @futureValue.ToString("N0")</p>
+                <p><strong> Total investment:</strong> @totalInvestment.ToString("N0")</p>
+                <p><strong> Total returns:</strong> @totalReturn.ToString("N0")</p>
+            </div>
+        }
 
-        <button class="btn-calculate" @onclick="Calculate"> Calculate </button>
     </div>
 </div>
 
 @code {
-    private decimal monthlyAmount = 0;
-    private decimal initialAmount = 0;
-    private int years = 0;
-    private decimal expectedReturnPercent = 7.0m;
+    // Model for the EditForm. Saves and binds the input.
+    private SavingScenarioModel model = new SavingScenarioModel()
+    {
+        Name = "",
+        MonthlyAmount = 1000m,
+        InitialAmount = 1000m,
+        SavingHorizon = 5,
+        ExpectedReturnPercent = 7m,
+        UserId = "placeholder"
+    };
 
+    private bool hasCalculated;
+    private decimal futureValue;
+    private decimal totalInvestment;
+    private decimal totalReturn;
+
+    // Calculates users input with the model above and through the calculations in CalculatorService.functions
     private void Calculate()
     {
+        hasCalculated = true;
 
+        futureValue = CalculatorService.CalculateFutureValue(
+        model.MonthlyAmount,
+        model.InitialAmount,
+        model.SavingHorizon,
+        model.ExpectedReturnPercent);
+
+        totalInvestment = CalculatorService.CalculateTotalInvestment(
+        model.MonthlyAmount,
+        model.InitialAmount,
+        model.SavingHorizon);
+
+        totalReturn = CalculatorService.CalculateTotalReturn(
+        futureValue,
+        totalInvestment);
     }
 }
