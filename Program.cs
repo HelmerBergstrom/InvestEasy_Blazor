@@ -4,12 +4,15 @@ using Microsoft.EntityFrameworkCore;
 using InvestEasy.Components;
 using InvestEasy.Components.Account;
 using InvestEasy.Data;
+using InvestEasy.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddScoped<ISavingCalculatorService, SavingCalculatorService>();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityRedirectManager>();

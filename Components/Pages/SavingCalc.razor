@@ -2,15 +2,49 @@
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 
+@using InvestEasy.Services
+@inject ISavingCalculatorService CalculatorService
+
 @using InvestEasy.Models
 
 <PageTitle> Saving Calculator </PageTitle>
 
 <h1> Saving Calculator </h1>
 
-<div class="calc-container">
-    <div class="result-box">
-        <h2> Total: 10000kr </h2>
-        <p> Return on investments: 1000kr </p>
+<div class="savings-calculator">
+    <div class="calculator-card">
+        <div class="input-group">
+            <label> Monthly savings (kr)</label>
+            <input type="number" class="form-input" @bind="monthlyAmount" min="0" max="100000" step="100" />
+        </div>
+
+        <div class="input-group">
+            <label> Initial amount (kr) </label>
+            <input type="number" class="form-input" @bind="initialAmount" min="0" max="10000000" step="1000" />
+        </div>
+
+        <div class="input-group">
+            <label> Time (years) </label>
+            <input type="number" class="form-input" @bind="years" min="1" max="50" step="1" />
+        </div>
+
+        <div class="input-group">
+            <label> Expected return on investment per year (%)</label>
+            <input type="number" class="form-input" @bind="expectedReturnPercent" min="0" max="20" step="0.1" />
+        </div>
+
+        <button class="btn-calculate" @onclick="Calculate"> Calculate </button>
     </div>
 </div>
+
+@code {
+    private decimal monthlyAmount = 0;
+    private decimal initialAmount = 0;
+    private int years = 0;
+    private decimal expectedReturnPercent = 7.0m;
+
+    private void Calculate()
+    {
+
+    }
+}
