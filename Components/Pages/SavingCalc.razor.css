@@ -1,0 +1,163 @@
+/* ===== SavingCalc professional styling (scoped to this page) ===== */
+
+/* Layout */
+.page-header {
+    max-width: 760px;
+    margin: 2.75rem auto 1.25rem auto;
+    padding: 0 1.25rem;
+}
+
+.page-title {
+    text-align: center;
+    margin: 0;
+    font-weight: 800;
+}
+
+.page-subtitle {
+    font-size: 1rem;
+    margin-top: 15px;
+    color: rgba(226, 232, 240, 0.88);
+    text-align: center;
+}
+
+.saving-calc {
+    max-width: 760px;
+    margin: 0 auto 3.25rem auto;
+    padding: 0 1.25rem;
+    border-radius: 18px;
+    padding: 1.75rem;
+    background: linear-gradient(180deg,
+            rgba(15, 23, 42, 0.78),
+            rgba(15, 23, 42, 0.58));
+    border: 1px solid rgba(226, 232, 240, 0.12);
+    box-shadow:
+        0 18px 55px rgba(0, 0, 0, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(10px);
+}
+
+/* Form groups */
+.input-group {
+    margin: 0 0 1.15rem 0;
+    display: grid;
+    gap: 0.55rem;
+}
+
+.input-group label {
+    font-weight: 700;
+    font-size: 0.98rem;
+    color: rgba(226, 232, 240, 0.88);
+}
+
+/* Inputs */
+.form-input {
+    border-radius: 12px;
+    border: 1px solid rgba(226, 232, 240, 0.14);
+    background: rgba(2, 6, 23, 0.55);
+    color: rgba(248, 250, 252, 0.95);
+    padding: 0.7rem 0.9rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.form-input::placeholder {
+    color: rgba(226, 232, 240, 0.45);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: rgba(34, 197, 94, 0.55);
+    box-shadow: 0 0 0 0.25rem rgba(34, 197, 94, 0.18);
+    background: rgba(2, 6, 23, 0.62);
+    color: rgba(248, 250, 252, 0.98);
+}
+
+.btn {
+    border-radius: 12px;
+    font-weight: 800;
+    padding: 0.65rem 1rem;
+}
+
+.btn.btn-success {
+    background: transparent;
+    border: 1px solid rgba(226, 232, 240, 0.22);
+    color: rgba(248, 250, 252, 0.92);
+    border-color: rgba(0, 255, 55, 0.4);
+}
+
+.btn.btn-danger {
+    background: transparent;
+    border: 1px solid rgba(226, 232, 240, 0.22);
+    color: rgba(248, 250, 252, 0.92);
+    border-color: rgba(248, 113, 113, 0.40);
+}
+
+.btn.btn-danger:hover {
+    background: rgba(248, 113, 113, 0.10);
+}
+
+.btn.btn-success:hover {
+    background: rgba(1, 169, 15, 0.1);
+}
+
+.btn+.btn {
+    margin-left: 0.75rem;
+}
+
+.result-hint {
+    margin-top: 1rem;
+    padding: 1rem 1.1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(226, 232, 240, 0.12);
+    background: rgba(30, 41, 59, 0.45);
+    color: white;
+    text-align: center;
+}
+
+.result-box {
+    margin-top: 1.25rem;
+    padding: 1.25rem;
+    border-radius: 14px;
+    border: 1px solid rgba(34, 197, 94, 0.24);
+    background: rgba(34, 197, 94, 0.10);
+    color: rgba(226, 232, 240, 0.96);
+}
+
+.result-box h3 {
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.result-box p {
+    font-size: 20px;
+}
+
+/* Validation summary */
+:global(.validation-summary-errors) {
+    margin: 0 0 1rem 0;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(248, 113, 113, 0.28);
+    background: rgba(248, 113, 113, 0.12);
+    color: rgba(254, 226, 226, 0.95);
+}
+
+:global(.validation-summary-errors ul) {
+    margin: 0;
+    padding-left: 1.15rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .form {
+        padding: 1.25rem;
+    }
+
+    .btn+.btn {
+        margin-left: 0;
+        margin-top: 0.6rem;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}

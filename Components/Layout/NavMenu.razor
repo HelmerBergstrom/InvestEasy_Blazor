@@ -2,7 +2,7 @@
 
 @inject NavigationManager NavigationManager
 
-<div class="nav-container">
+<header class="nav-container">
 
     <NavLink href="/" Match="NavLinkMatch.All" class="nav-logo">
         <img src="images/logo.png" class="logo" alt="Logotyp">
@@ -63,7 +63,7 @@
             </NotAuthorized>
         </AuthorizeView>
     </nav>
-</div>
+</header>
 
 @code {
     private string? currentUrl;

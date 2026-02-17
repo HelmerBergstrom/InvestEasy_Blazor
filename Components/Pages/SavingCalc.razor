@@ -3,77 +3,84 @@
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 
+@using BlazorBootstrap
+
 @using InvestEasy.Models
 @using InvestEasy.Services
 @inject ISavingCalculatorService CalculatorService
 
 <PageTitle> Saving Calculator </PageTitle>
 
-<h1> Saving Calculator </h1>
+<div class="page-header">
+    <h1 class="page-title">Saving Calculator</h1>
+    <p class="page-subtitle">Plan, compare and estimate long-term savings with monthly compounding.</p>
+</div>
 
-<div class="savings-calculator" style="color: white;">
-    <div class="calculator-card">
 
-        <!-- Enhance = false to prevent site reloading. -->
-        <EditForm Model="@model" OnValidSubmit="Calculate" Enhance="false" FormName="SavingCalculatorForm">
-            <DataAnnotationsValidator />
+<div class="saving-calc">
 
-            <!-- Error-messages in summary (in a list) -->
-            <ValidationSummary />
+    <!-- Enhance = false to prevent site reloading. -->
+    <EditForm class="form" Model="@model" OnValidSubmit="Calculate" Enhance="false" FormName="SavingCalculatorForm">
+        <DataAnnotationsValidator />
 
-            <div class="input-group">
-                <label for="name"> Saving scenario name </label>
-                <InputText id="name" class="form-control" @bind-Value="model.Name" />
-            </div>
+        <!-- Error-messages in summary (in a list) -->
+        <ValidationSummary />
 
-            <div class="input-group">
-                <label for="monthly"> Monthly savings </label>
-                <InputNumber id="monthly" class="form-control" @bind-Value="model.MonthlyAmount" />
-            </div>
-
-            <div class="input-group">
-                <label for="initial"> Initial amount </label>
-                <InputNumber id="initial" class="form-control" @bind-Value="model.InitialAmount" />
-            </div>
-
-            <div class="input-group">
-                <label for="years"> Saving horizon (years)</label>
-                <InputNumber id="years" class="form-control" @bind-Value="model.SavingHorizon" />
-            </div>
-
-            <div class="input-group">
-                <label for="return"> Expected yearly return (%)</label>
-                <InputNumber id="return" class="form-control" @bind-Value="model.ExpectedReturnPercent" />
-            </div>
-
-            <button type="submit" class="btn btn-success"> Calculate </button>
-            <button type="reset" class="btn btn-danger"> Clear form </button>
-        </EditForm>
-
-        <div class="result-hint">
-            <p>
-                The calculation assumes monthly compound interest based on stated annual return.
-            </p>
+        <div class="input-group">
+            <label for="name"> Saving scenario name </label>
+            <InputText id="name" class="form-input" @bind-Value="model.Name" />
         </div>
 
-        <!-- If hasCalculated turns true, display results -->
-        @if (hasCalculated)
-        {
-            <div class="result-box">
-                <h3> Results </h3>
+        <div class="input-group">
+            <label for="monthly"> Monthly savings </label>
+            <RangeInput TValue="decimal" @bind-Value="model.MonthlyAmount" Min="0" Max="15000" Step="500" />
+            <Badge Color="BadgeColor.Primary" visuallyHiddenText="model.MonthlyAmount">
+                @model.MonthlyAmount</Badge>
+        </div>
 
-                @if (!string.IsNullOrWhiteSpace(model.Name))
-                {
-                    <p><strong> Saving scenario:</strong> @model.Name</p>
-                }
+        <div class="input-group">
+            <label for="initial"> Initial amount </label>
 
-                <p><strong> Future value:</strong> @futureValue.ToString("N0")</p>
-                <p><strong> Total investment:</strong> @totalInvestment.ToString("N0")</p>
-                <p><strong> Total returns:</strong> @totalReturn.ToString("N0")</p>
-            </div>
-        }
+            <InputNumber id="initial" class="form-input" @bind-Value="model.InitialAmount" />
+        </div>
 
+        <div class="input-group">
+            <label for="years"> Saving horizon (years)</label>
+            <InputNumber id="years" class="form-input" @bind-Value="model.SavingHorizon" />
+        </div>
+
+        <div class="input-group">
+            <label for="return"> Expected yearly return (%)</label>
+            <InputNumber id="return" class="form-input" @bind-Value="model.ExpectedReturnPercent" />
+        </div>
+
+        <button type="submit" class="btn btn-success"> Calculate </button>
+        <button type="reset" class="btn btn-danger"> Clear form </button>
+    </EditForm>
+
+    <div class="result-hint">
+        <p>
+            The calculation assumes monthly compound interest based on stated annual return.
+        </p>
     </div>
+
+    <!-- If hasCalculated turns true, display results -->
+    @if (hasCalculated)
+    {
+        <div class="result-box">
+            <h3> Results </h3>
+
+            @if (!string.IsNullOrWhiteSpace(model.Name))
+            {
+                <p><strong> Saving scenario:</strong> @model.Name</p>
+            }
+
+            <p><strong> Future value:</strong> @futureValue.ToString("N0")</p>
+            <p><strong> Total investment:</strong> @totalInvestment.ToString("N0")</p>
+            <p><strong> Total returns:</strong> @totalReturn.ToString("N0")</p>
+        </div>
+    }
+
 </div>
 
 @code {
