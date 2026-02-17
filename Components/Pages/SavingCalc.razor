@@ -24,7 +24,9 @@
         <DataAnnotationsValidator />
 
         <!-- Error-messages in summary (in a list) -->
-        <ValidationSummary />
+        <div class="error-messages">
+            <ValidationSummary />
+        </div>
 
         <div class="input-group">
             <label for="name"> Saving scenario name </label>
@@ -50,7 +52,7 @@
         </div>
 
         <div class="input-group">
-            <label for="return"> Expected yearly return (%)</label>
+            <label for="return"> Expected annual return (%)</label>
             <InputNumber id="return" class="form-input" @bind-Value="model.ExpectedReturnPercent" />
         </div>
 
@@ -67,15 +69,23 @@
     <!-- If hasCalculated turns true, display results -->
     @if (hasCalculated)
     {
+        <div class="summary">
+            <br>
+            <h3> Summary </h3>
+            <p><strong> Monthly savings:</strong> @model.MonthlyAmount </p>
+            <p><strong> Initial amount:</strong> @model.InitialAmount </p>
+            <p><strong> Saving horizon:</strong> @model.SavingHorizon years</p>
+            <p><strong> Expected annual return:</strong> @model.ExpectedReturnPercent%</p>
+        </div>
         <div class="result-box">
-            <h3> Results </h3>
+            <h3> Results of this scenario </h3>
 
             @if (!string.IsNullOrWhiteSpace(model.Name))
             {
                 <p><strong> Saving scenario:</strong> @model.Name</p>
             }
 
-            <p><strong> Future value:</strong> @futureValue.ToString("N0")</p>
+            <p><strong> Final value (after @model.SavingHorizon years):</strong> @futureValue.ToString("N0")</p>
             <p><strong> Total investment:</strong> @totalInvestment.ToString("N0")</p>
             <p><strong> Total returns:</strong> @totalReturn.ToString("N0")</p>
         </div>

@@ -5,9 +5,6 @@
     padding: 1rem 2rem;
     background: linear-gradient(135deg, #1e293b 0%, #2c3d57 50%, #243447 100%);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    position: relative;
-    top: 0;
-    z-index: 1000;
 }
 
 .nav-logo {
