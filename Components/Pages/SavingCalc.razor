@@ -1,13 +1,14 @@
 @page "/savingcalc"
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
 @attribute [Authorize]
 
 @using BlazorBootstrap
 
 @using InvestEasy.Models
 @using InvestEasy.Services
-@inject ISavingCalculatorService CalculatorService
 
 <PageTitle> Saving Calculator </PageTitle>
 
@@ -77,6 +78,7 @@
             <p><strong> Saving horizon:</strong> @model.SavingHorizon years</p>
             <p><strong> Expected annual return:</strong> @model.ExpectedReturnPercent%</p>
         </div>
+
         <div class="result-box">
             <h3> Results of this scenario </h3>
 
@@ -89,45 +91,39 @@
             <p><strong> Total investment:</strong> @totalInvestment.ToString("N0")</p>
             <p><strong> Total returns:</strong> @totalReturn.ToString("N0")</p>
         </div>
+
+        <button class="btn btn-primary" @onclick="SaveScenario">
+            Save scenario
+        </button>
+
+        @if (!string.IsNullOrWhiteSpace(saveMessage))
+        {
+            <p class="text-success"> @saveMessage </p>
+        }
+        @if (!string.IsNullOrWhiteSpace(saveError))
+        {
+            <p class="text-danger"> @saveError </p>
+        }
+    }
+    @if (savedScenarios.Any())
+    {
+        <h3> Saved scenarios </h3>
+
+        @foreach (SavingScenarioModel s in savedScenarios)
+        {
+            <div class="result-box">
+                <p><strong> @s.Name </strong></p>
+                <p> Monthly: @s.MonthlyAmount </p>
+                <p> Initial: @s.InitialAmount </p>
+                <p> Horizon: @s.SavingHorizon years </p>
+                <p> Return: @s.ExpectedReturnPercent% </p>
+                <p> Created: @s.CreatedDate </p>
+            </div>
+        }
+    }
+    else
+    {
+        <p> No saved scenarios yet. </p>
     }
 
 </div>
-
-@code {
-    // Model for the EditForm. Saves and binds the input.
-    private SavingScenarioModel model = new SavingScenarioModel()
-    {
-        Name = "",
-        MonthlyAmount = 1000m,
-        InitialAmount = 1000m,
-        SavingHorizon = 5,
-        ExpectedReturnPercent = 7m,
-        UserId = "placeholder"
-    };
-
-    private bool hasCalculated;
-    private decimal futureValue;
-    private decimal totalInvestment;
-    private decimal totalReturn;
-
-    // Calculates users input with the model above and through the calculations in CalculatorService.functions
-    private void Calculate()
-    {
-        hasCalculated = true;
-
-        futureValue = CalculatorService.CalculateFutureValue(
-        model.MonthlyAmount,
-        model.InitialAmount,
-        model.SavingHorizon,
-        model.ExpectedReturnPercent);
-
-        totalInvestment = CalculatorService.CalculateTotalInvestment(
-        model.MonthlyAmount,
-        model.InitialAmount,
-        model.SavingHorizon);
-
-        totalReturn = CalculatorService.CalculateTotalReturn(
-        futureValue,
-        totalInvestment);
-    }
-}

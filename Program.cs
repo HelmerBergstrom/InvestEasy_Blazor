@@ -12,7 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddScoped<ISavingCalculatorService, SavingCalculatorService>();
+builder.Services.AddScoped<ICalculatorService, CalculatorService>();
+builder.Services.AddScoped<SavingScenarioService>();
+builder.Services.AddScoped<CurrentUserService>();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityRedirectManager>();

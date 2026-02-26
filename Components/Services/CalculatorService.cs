@@ -1,17 +1,15 @@
 namespace InvestEasy.Services;
 
-public interface ISavingCalculatorService
+public interface ICalculatorService
 {
     decimal CalculateFutureValue(decimal monthlyAmount, decimal initialAmount, int years, decimal expectedReturnPercent);
 
     decimal CalculateTotalInvestment(decimal monthlyAmount, decimal initialAmount, int years);
 
     decimal CalculateTotalReturn(decimal futureValue, decimal totalInvestment);
-
-
 }
 
-public class SavingCalculatorService : ISavingCalculatorService
+public class CalculatorService : ICalculatorService
 {
     public decimal CalculateFutureValue(decimal monthlyAmount, decimal initialAmount, int years, decimal expectedReturnPercent)
     {
