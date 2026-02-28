@@ -10,6 +10,7 @@
 @using InvestEasy.Models
 @using InvestEasy.Services
 
+
 <PageTitle> Saving Calculator </PageTitle>
 
 <div class="page-header">
@@ -117,17 +118,29 @@
 
         @foreach (SavingScenarioModel s in savedScenarios)
         {
-            <div class="result-box">
-                <p><strong> @s.Name </strong></p>
-                <p> Monthly: @s.MonthlyAmount </p>
-                <p> Initial: @s.InitialAmount </p>
-                <p> Horizon: @s.SavingHorizon years </p>
-                <p> Return: @s.ExpectedReturnPercent% </p>
-                <p> Created: @s.CreatedDate </p>
+            var futureValue = CalculatorService.CalculateFutureValue(
+            s.MonthlyAmount,
+            s.InitialAmount,
+            s.SavingHorizon,
+            s.ExpectedReturnPercent);
+
+            <br />
+
+            <h4><strong> @s.Name - @s.CreatedDate </strong></h4>
+            <p><strong> Monthly saving:</strong> @s.MonthlyAmount.ToString(format: "N0") </p>
+            <p><strong> Initial amount:</strong> @s.InitialAmount.ToString(format: "N0") </p>
+            <p><strong> Time horizon:</strong> @s.SavingHorizon years </p>
+            <p><strong> Expected annual return:</strong> @s.ExpectedReturnPercent.ToString(format: "N0")% </p>
+            <p class="final-value-saving"><strong>Final value: @futureValue.ToString("N0")</strong></p>
+
+
+            <div class="calculation-btns-saved">
+                <button class="btn btn-success"> Edit Scenario </button>
+                <button class="btn btn-danger" type="button" @onclick="() => DeleteScenario(s.Id)">
+                    Delete Scenario
+                </button>
             </div>
 
-            <button class="btn btn-danger"> Delete Scenario </button>
-            <button class="btn btn-success"> Edit Scenario </button>
         }
     }
     else if (!savedScenarios.Any())

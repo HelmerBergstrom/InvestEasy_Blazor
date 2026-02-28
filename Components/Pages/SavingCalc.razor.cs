@@ -46,6 +46,7 @@ public partial class SavingCalc
     protected void Calculate()
     {
         hasCalculated = true;
+        saveMessage = null;
 
         futureValue = CalculatorService.CalculateFutureValue(
             model.MonthlyAmount,
@@ -118,5 +119,31 @@ public partial class SavingCalc
         savedScenarios = await ScenarioService.GetAllScenariosForUser(userId);
 
         saveMessage = "Scenario saved.";
+    }
+
+    protected async Task DeleteScenario(int scenarioId)
+    {
+        saveError = null;
+        saveMessage = null;
+
+        // Gets user and validates user.
+        var userId = await CurrentUserService.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            saveError = "Couldn´t identify user. Please log in again.";
+            return;
+        }
+
+        // Send model to method in SavingScenarioService to DELETE from database.
+        var deleted = await ScenarioService.DeleteScenario(scenarioId, userId);
+        if (!deleted)
+        {
+            saveError = "Couldn´t delete the scenario.";
+            return;
+        }
+
+        // Loading lis again
+        savedScenarios = await ScenarioService.GetAllScenariosForUser(userId);
+        saveMessage = "Scenario deleted.";
     }
 }

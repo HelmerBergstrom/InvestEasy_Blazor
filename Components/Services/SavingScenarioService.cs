@@ -52,4 +52,20 @@ public class SavingScenarioService
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
     }
+
+    // Method to delete one scenario for a specific user. Returns true if successful.
+    public async Task<bool> DeleteScenario(int id, string userId)
+    {
+        var entity = await dbContext.SavingScenarios
+            .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
+
+        if (entity is null)
+        {
+            return false;
+        }
+
+        dbContext.SavingScenarios.Remove(entity);
+        await dbContext.SaveChangesAsync();
+        return true;
+    }
 }
