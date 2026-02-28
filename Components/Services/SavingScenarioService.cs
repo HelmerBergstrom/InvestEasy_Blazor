@@ -13,7 +13,7 @@ public class SavingScenarioService
         this.dbContext = dbContext;
     }
 
-    // Method to save a scenario.
+    // Method to save a scenario to database.
     public async Task<SavingScenarioModel> CreateScenario(SavingScenarioModel scenario)
     {
         // new scenario

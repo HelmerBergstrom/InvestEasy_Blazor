@@ -14,7 +14,7 @@ public class SavingScenarioModel
     [Display(Name = "Monthly savings")]
     public decimal MonthlyAmount { get; set; }
 
-    [Range(0, 10000000)]
+    [Required]
     [Display(Name = "Initial amount")]
     public decimal InitialAmount { get; set; }
 
@@ -25,6 +25,7 @@ public class SavingScenarioModel
     public int SavingHorizon { get; set; }
 
     // Årlig procent. Input 7 betyder 7%
+    [Required]
     [Range(0, 20)]
     [Display(Name = "Expected yearly return (%)")]
     public decimal ExpectedReturnPercent { get; set; }

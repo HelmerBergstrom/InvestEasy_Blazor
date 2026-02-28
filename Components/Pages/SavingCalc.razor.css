@@ -41,11 +41,12 @@
     margin: 0 0 1.15rem 0;
     display: grid;
     gap: 0.55rem;
+    font-size: 20px;
 }
 
 .input-group label {
     font-weight: 700;
-    font-size: 0.98rem;
+    font-size: 18px;
     color: rgba(226, 232, 240, 0.88);
 }
 
@@ -103,16 +104,6 @@
     margin-left: 0.75rem;
 }
 
-.result-hint {
-    margin-top: 1rem;
-    padding: 1rem 1.1rem;
-    border-radius: 14px;
-    border: 1px solid rgba(226, 232, 240, 0.12);
-    background: rgba(30, 41, 59, 0.45);
-    color: white;
-    text-align: center;
-}
-
 .summary {
     margin-top: 1.25rem;
     padding: 1.25rem;
@@ -146,6 +137,10 @@
 
     padding: 1rem;
     border-radius: 10px;
+}
+
+.calculation-btns {
+    margin-top: 15px;
 }
 
 /* Validation summary */

@@ -14,87 +14,88 @@
 
 <div class="page-header">
     <h1 class="page-title">Saving Calculator</h1>
-    <p class="page-subtitle">Plan, compare and estimate long-term savings with monthly compounding.</p>
+    <p class="page-subtitle">Plan, compare and estimate long-term savings with monthly compounding.
+        The calculation assumes monthly compound interest based on stated annual return.
+    </p>
 </div>
 
 
 <div class="saving-calc">
 
-    <!-- Enhance = false to prevent site reloading. -->
-    <EditForm class="form" Model="@model" OnValidSubmit="Calculate" Enhance="false" FormName="SavingCalculatorForm">
-        <DataAnnotationsValidator />
+    @if (!hasCalculated)
+    {
 
-        <!-- Error-messages in summary (in a list) -->
-        <div class="error-messages">
-            <ValidationSummary />
-        </div>
 
-        <div class="input-group">
-            <label for="name"> Saving scenario name </label>
-            <InputText id="name" class="form-input" @bind-Value="model.Name" />
-        </div>
+        <!-- Enhance = false to prevent site reloading. -->
+        <EditForm class="form" Model="@model" OnValidSubmit="Calculate" Enhance="false" FormName="SavingCalculatorForm">
+            <DataAnnotationsValidator />
 
-        <div class="input-group">
-            <label for="monthly"> Monthly savings </label>
-            <RangeInput TValue="decimal" @bind-Value="model.MonthlyAmount" Min="0" Max="15000" Step="500" />
-            <Badge Color="BadgeColor.Primary" visuallyHiddenText="model.MonthlyAmount">
-                @model.MonthlyAmount</Badge>
-        </div>
+            <!-- Error-messages in summary (in a list) -->
+            <div class="error-messages">
+                <ValidationSummary />
+            </div>
 
-        <div class="input-group">
-            <label for="initial"> Initial amount </label>
+            <div class="input-group">
+                <label for="name"> Scenario name </label>
+                <InputText id="name" class="form-input" @bind-Value="model.Name" />
+            </div>
 
-            <InputNumber id="initial" class="form-input" @bind-Value="model.InitialAmount" />
-        </div>
+            <div class="input-group">
+                <label for="initial"> Initial amount </label>
+                <InputNumber id="initial" class="form-input" @bind-Value="model.InitialAmount" />
+            </div>
 
-        <div class="input-group">
-            <label for="years"> Saving horizon (years)</label>
-            <InputNumber id="years" class="form-input" @bind-Value="model.SavingHorizon" />
-        </div>
+            <div class="input-group">
+                <label for="monthly"> Monthly savings </label>
+                <RangeInput TValue="decimal" @bind-Value="model.MonthlyAmount" Min="0" Max="15000" Step="500" />
+                <Badge Color="BadgeColor.Primary" visuallyHiddenText="model.MonthlyAmount">
+                    @model.MonthlyAmount</Badge>
+            </div>
 
-        <div class="input-group">
-            <label for="return"> Expected annual return (%)</label>
-            <InputNumber id="return" class="form-input" @bind-Value="model.ExpectedReturnPercent" />
-        </div>
 
-        <button type="submit" class="btn btn-success"> Calculate </button>
-        <button type="reset" class="btn btn-danger"> Clear form </button>
-    </EditForm>
+            <div class="input-group">
+                <label for="years"> Saving horizon (years)</label>
+                <InputNumber id="years" class="form-input" @bind-Value="model.SavingHorizon" />
+            </div>
 
-    <div class="result-hint">
-        <p>
-            The calculation assumes monthly compound interest based on stated annual return.
-        </p>
-    </div>
+            <div class="input-group">
+                <label for="return"> Expected annual return (%)</label>
+                <InputNumber id="return" class="form-input" @bind-Value="model.ExpectedReturnPercent" />
+            </div>
+
+            <button type="submit" class="btn btn-success"> Calculate </button>
+            <button type="button" class="btn btn-danger" @onclick="ClearCalculation"> Reset form </button>
+        </EditForm>
+    }
 
     <!-- If hasCalculated turns true, display results -->
     @if (hasCalculated)
     {
         <div class="summary">
             <br>
-            <h3> Summary </h3>
-            <p><strong> Monthly savings:</strong> @model.MonthlyAmount </p>
+            <h3> Summary of scenario "@model.Name" </h3>
             <p><strong> Initial amount:</strong> @model.InitialAmount </p>
+            <p><strong> Monthly savings:</strong> @model.MonthlyAmount </p>
             <p><strong> Saving horizon:</strong> @model.SavingHorizon years</p>
             <p><strong> Expected annual return:</strong> @model.ExpectedReturnPercent%</p>
         </div>
 
         <div class="result-box">
-            <h3> Results of this scenario </h3>
+            <h3> Results of scenario "@model.Name" </h3>
 
-            @if (!string.IsNullOrWhiteSpace(model.Name))
-            {
-                <p><strong> Saving scenario:</strong> @model.Name</p>
-            }
-
-            <p><strong> Final value (after @model.SavingHorizon years):</strong> @futureValue.ToString("N0")</p>
             <p><strong> Total investment:</strong> @totalInvestment.ToString("N0")</p>
             <p><strong> Total returns:</strong> @totalReturn.ToString("N0")</p>
+            <p><strong> Final value (after @model.SavingHorizon years):</strong> @futureValue.ToString("N0")</p>
         </div>
 
-        <button class="btn btn-primary" @onclick="SaveScenario">
-            Save scenario
-        </button>
+        <div class="calculation-btns">
+            <button class="btn btn-success" @onclick="async () => { await SaveScenario(); ClearCalculation(); }">
+                Save scenario
+            </button>
+            <button class="btn btn-danger ms-2" @onclick="ClearCalculation" type="button">
+                Start over
+            </button>
+        </div>
 
         @if (!string.IsNullOrWhiteSpace(saveMessage))
         {
@@ -105,7 +106,12 @@
             <p class="text-danger"> @saveError </p>
         }
     }
-    @if (savedScenarios.Any())
+
+</div>
+
+
+<div class="saving-calc">
+    @if (savedScenarios.Any() && !hasCalculated)
     {
         <h3> Saved scenarios </h3>
 
@@ -119,9 +125,12 @@
                 <p> Return: @s.ExpectedReturnPercent% </p>
                 <p> Created: @s.CreatedDate </p>
             </div>
+
+            <button class="btn btn-danger"> Delete Scenario </button>
+            <button class="btn btn-success"> Edit Scenario </button>
         }
     }
-    else
+    else if (!savedScenarios.Any())
     {
         <p> No saved scenarios yet. </p>
     }

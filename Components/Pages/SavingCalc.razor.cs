@@ -42,7 +42,48 @@ public partial class SavingCalc
         savedScenarios = await ScenarioService.GetAllScenariosForUser(userId);
     }
 
-    // method to save a scenario
+    // Calculates users input with the model above and through the calculations in CalculatorService.functions
+    protected void Calculate()
+    {
+        hasCalculated = true;
+
+        futureValue = CalculatorService.CalculateFutureValue(
+            model.MonthlyAmount,
+            model.InitialAmount,
+            model.SavingHorizon,
+            model.ExpectedReturnPercent);
+
+        totalInvestment = CalculatorService.CalculateTotalInvestment(
+            model.MonthlyAmount,
+            model.InitialAmount,
+            model.SavingHorizon);
+
+        totalReturn = CalculatorService.CalculateTotalReturn(
+            futureValue,
+            totalInvestment);
+    }
+
+    protected void ClearCalculation()
+    {
+        hasCalculated = false;
+
+        saveMessage = null;
+        saveError = null;
+
+        futureValue = 0;
+        totalInvestment = 0;
+        totalReturn = 0;
+
+
+        model.Name = "";
+        model.MonthlyAmount = 1000m;
+        model.InitialAmount = 1000m;
+        model.SavingHorizon = 5;
+        model.ExpectedReturnPercent = 7m;
+    }
+
+    // Validates and sends calculation/scenario to SavingScenarioService
+    // for database-handling.
     protected async Task SaveScenario()
     {
         saveError = null;
@@ -70,33 +111,12 @@ public partial class SavingCalc
         // Linking scenario to user
         model.UserId = userId;
 
-        // CREATE to database
+        // Send model to method in SavingScenarioService to CREATE to database.
         await ScenarioService.CreateScenario(model);
 
         // GET lastest list
         savedScenarios = await ScenarioService.GetAllScenariosForUser(userId);
 
         saveMessage = "Scenario saved.";
-    }
-
-    // Calculates users input with the model above and through the calculations in CalculatorService.functions
-    protected void Calculate()
-    {
-        hasCalculated = true;
-
-        futureValue = CalculatorService.CalculateFutureValue(
-            model.MonthlyAmount,
-            model.InitialAmount,
-            model.SavingHorizon,
-            model.ExpectedReturnPercent);
-
-        totalInvestment = CalculatorService.CalculateTotalInvestment(
-            model.MonthlyAmount,
-            model.InitialAmount,
-            model.SavingHorizon);
-
-        totalReturn = CalculatorService.CalculateTotalReturn(
-            futureValue,
-            totalInvestment);
     }
 }
