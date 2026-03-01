@@ -12,11 +12,11 @@ public class SavingScenarioModel
 
     [Range(0, 15000)]
     [Display(Name = "Monthly savings")]
-    public decimal MonthlyAmount { get; set; }
+    public int MonthlyAmount { get; set; }
 
     [Required]
     [Display(Name = "Initial amount")]
-    public decimal InitialAmount { get; set; }
+    public int InitialAmount { get; set; }
 
     // År för sparandet.
     [Required]
@@ -28,7 +28,7 @@ public class SavingScenarioModel
     [Required]
     [Range(0, 20)]
     [Display(Name = "Expected yearly return (%)")]
-    public decimal ExpectedReturnPercent { get; set; }
+    public int ExpectedReturnPercent { get; set; }
 
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 

@@ -14,15 +14,16 @@ public partial class SavingCalc
     protected List<SavingScenarioModel> savedScenarios = new();
     protected string? saveError;
     protected string? saveMessage;
+    protected int? editingScenarioId = null;
 
     // Model for the EditForm. Saves and binds the input.
     protected SavingScenarioModel model = new()
     {
         Name = "",
-        MonthlyAmount = 1000m,
-        InitialAmount = 1000m,
+        MonthlyAmount = 1000,
+        InitialAmount = 1000,
         SavingHorizon = 5,
-        ExpectedReturnPercent = 7m,
+        ExpectedReturnPercent = 7,
         UserId = "placeholder"
     };
 
@@ -77,10 +78,10 @@ public partial class SavingCalc
 
 
         model.Name = "";
-        model.MonthlyAmount = 1000m;
-        model.InitialAmount = 1000m;
+        model.MonthlyAmount = 1000;
+        model.InitialAmount = 1000;
         model.SavingHorizon = 5;
-        model.ExpectedReturnPercent = 7m;
+        model.ExpectedReturnPercent = 7;
     }
 
     // Validates and sends calculation/scenario to SavingScenarioService
@@ -121,6 +122,77 @@ public partial class SavingCalc
         saveMessage = "Scenario saved.";
     }
 
+    // starting "edit-mode". 
+    protected void StartEditScenario(int id)
+    {
+        saveError = null;
+        saveMessage = null;
+
+        var scenario = savedScenarios.FirstOrDefault(s => s.Id == id);
+        if (scenario is null)
+        {
+            saveError = "Scenario not found.";
+            return;
+        }
+
+        editingScenarioId = id;
+
+        // Sets form values to scenario values
+        model.Name = scenario.Name;
+        model.MonthlyAmount = scenario.MonthlyAmount;
+        model.InitialAmount = scenario.InitialAmount;
+        model.SavingHorizon = scenario.SavingHorizon;
+        model.ExpectedReturnPercent = scenario.ExpectedReturnPercent;
+
+        hasCalculated = false; // Goes back to form-mode.
+    }
+
+    // Method to update a specific scenario.
+    protected async Task UpdateScenario()
+    {
+        saveError = null;
+        saveMessage = null;
+
+        if (editingScenarioId is null)
+        {
+            saveError = "No scenario selected for editing.";
+            return;
+        }
+
+        var userId = await CurrentUserService.GetUserId();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            saveError = "Couldn't identify user. Please log in again.";
+            return;
+        }
+
+        // sets updated scenario to database.
+        var updated = await ScenarioService.UpdateScenario(
+            editingScenarioId.Value,
+            userId,
+            model);
+
+        if (!updated)
+        {
+            saveError = "Couldn't update scenario.";
+            return;
+        }
+
+        // gets saved scenarios again.
+        savedScenarios = await ScenarioService.GetAllScenariosForUser(userId);
+
+        saveMessage = "Scenario updated.";
+        editingScenarioId = null;
+    }
+
+    // Cancels edit-mode and goes back to normal form
+    protected void CancelEdit()
+    {
+        editingScenarioId = null;
+        ClearCalculation();
+    }
+
+    // Method to delete a scenario. 
     protected async Task DeleteScenario(int scenarioId)
     {
         saveError = null;

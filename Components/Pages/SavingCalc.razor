@@ -23,51 +23,61 @@
 
 <div class="saving-calc">
 
-    @if (!hasCalculated)
+    @if (editingScenarioId is not null)
     {
-
-
-        <!-- Enhance = false to prevent site reloading. -->
-        <EditForm class="form" Model="@model" OnValidSubmit="Calculate" Enhance="false" FormName="SavingCalculatorForm">
-            <DataAnnotationsValidator />
-
-            <!-- Error-messages in summary (in a list) -->
-            <div class="error-messages">
-                <ValidationSummary />
+        <div class="alert-editing">
+            <div>
+                <strong>Edit mode:</strong> You are editing scenario "@model.Name".
+                <br>
+                Update the values and click <strong>Update scenario</strong>.
             </div>
-
-            <div class="input-group">
-                <label for="name"> Scenario name </label>
-                <InputText id="name" class="form-input" @bind-Value="model.Name" />
-            </div>
-
-            <div class="input-group">
-                <label for="initial"> Initial amount </label>
-                <InputNumber id="initial" class="form-input" @bind-Value="model.InitialAmount" />
-            </div>
-
-            <div class="input-group">
-                <label for="monthly"> Monthly savings </label>
-                <RangeInput TValue="decimal" @bind-Value="model.MonthlyAmount" Min="0" Max="15000" Step="500" />
-                <Badge Color="BadgeColor.Primary" visuallyHiddenText="model.MonthlyAmount">
-                    @model.MonthlyAmount</Badge>
-            </div>
-
-
-            <div class="input-group">
-                <label for="years"> Saving horizon (years)</label>
-                <InputNumber id="years" class="form-input" @bind-Value="model.SavingHorizon" />
-            </div>
-
-            <div class="input-group">
-                <label for="return"> Expected annual return (%)</label>
-                <InputNumber id="return" class="form-input" @bind-Value="model.ExpectedReturnPercent" />
-            </div>
-
-            <button type="submit" class="btn btn-success"> Calculate </button>
-            <button type="button" class="btn btn-danger" @onclick="ClearCalculation"> Reset form </button>
-        </EditForm>
+            <button class="btn btn-secondary" type="button" @onclick="CancelEdit">
+                Exit edit mode
+            </button>
+        </div>
     }
+
+
+    <!-- Enhance = false to prevent site reloading. -->
+    <EditForm class="form" Model="@model" OnValidSubmit="Calculate" Enhance="false" FormName="SavingCalculatorForm">
+        <DataAnnotationsValidator />
+
+        <!-- Error-messages in summary (in a list) -->
+        <div class="error-messages">
+            <ValidationSummary />
+        </div>
+
+        <div class="input-group">
+            <label for="name"> Scenario name </label>
+            <InputText id="name" class="form-input" @bind-Value="model.Name" />
+        </div>
+
+        <div class="input-group">
+            <label for="initial"> Initial amount </label>
+            <InputNumber id="initial" class="form-input" @bind-Value="model.InitialAmount" />
+        </div>
+
+        <div class="input-group">
+            <label for="monthly"> Monthly savings </label>
+            <RangeInput TValue="int" @bind-Value="model.MonthlyAmount" Min="0" Max="15000" Step="500" />
+            <Badge Color="BadgeColor.Primary" visuallyHiddenText="model.MonthlyAmount">
+                @model.MonthlyAmount</Badge>
+        </div>
+
+
+        <div class="input-group">
+            <label for="years"> Saving horizon (years)</label>
+            <InputNumber id="years" class="form-input" @bind-Value="model.SavingHorizon" />
+        </div>
+
+        <div class="input-group">
+            <label for="return"> Expected annual return (%)</label>
+            <InputNumber id="return" class="form-input" @bind-Value="model.ExpectedReturnPercent" />
+        </div>
+
+        <button type="submit" class="btn btn-success"> Calculate </button>
+        <button type="button" class="btn btn-danger" @onclick="ClearCalculation"> Reset form </button>
+    </EditForm>
 
     <!-- If hasCalculated turns true, display results -->
     @if (hasCalculated)
@@ -90,12 +100,26 @@
         </div>
 
         <div class="calculation-btns">
-            <button class="btn btn-success" @onclick="async () => { await SaveScenario(); ClearCalculation(); }">
-                Save scenario
-            </button>
-            <button class="btn btn-danger ms-2" @onclick="ClearCalculation" type="button">
-                Start over
-            </button>
+
+            @if (editingScenarioId is null)
+            {
+                <button class="btn btn-success" @onclick="async () => { await SaveScenario(); ClearCalculation(); }">
+                    Save scenario
+                </button>
+                <button class="btn btn-danger ms-2" @onclick="ClearCalculation" type="button">
+                    Start over
+                </button>
+            }
+            else
+            {
+                <button class="btn btn-warning" @onclick="async () => { await UpdateScenario(); ClearCalculation(); }">
+                    Update scenario
+                </button>
+
+                <button class="btn btn-secondary ms-2" type="button" @onclick="CancelEdit">
+                    Cancel edit
+                </button>
+            }
         </div>
 
         @if (!string.IsNullOrWhiteSpace(saveMessage))
@@ -112,7 +136,7 @@
 
 
 <div class="saving-calc">
-    @if (savedScenarios.Any() && !hasCalculated)
+    @if (savedScenarios.Any() && editingScenarioId is null)
     {
         <h3> Saved scenarios </h3>
 
@@ -135,7 +159,9 @@
 
 
             <div class="calculation-btns-saved">
-                <button class="btn btn-success"> Edit Scenario </button>
+                <button class="btn btn-success" type="button" @onclick="() => StartEditScenario(s.Id)">
+                    Edit Scenario
+                </button>
                 <button class="btn btn-danger" type="button" @onclick="() => DeleteScenario(s.Id)">
                     Delete Scenario
                 </button>

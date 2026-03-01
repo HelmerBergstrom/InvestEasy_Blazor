@@ -175,6 +175,25 @@
     padding-left: 1.15rem;
 }
 
+.alert-editing {
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    border-radius: 14px;
+    background: rgba(205, 157, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    color: white;
+    backdrop-filter: blur(6px);
+}
+
+.alert-editing strong {
+    color: white;
+}
+
+.alert-editing button {
+    font-weight: 700;
+    margin-top: 5px;
+}
+
 /* Responsive */
 @media (max-width: 740px) {
     .form {

@@ -53,6 +53,28 @@ public class SavingScenarioService
             .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
     }
 
+    // Method to update a scenario to database.
+    public async Task<bool> UpdateScenario(int id, string userId, SavingScenarioModel updated)
+    {
+        // gets specific scenario.
+        var entity = await dbContext.SavingScenarios
+            .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
+
+        if (entity is null)
+            return false;
+
+        // updates values.
+        entity.Name = updated.Name?.Trim() ?? "";
+        entity.MonthlyAmount = updated.MonthlyAmount;
+        entity.InitialAmount = updated.InitialAmount;
+        entity.SavingHorizon = updated.SavingHorizon;
+        entity.ExpectedReturnPercent = updated.ExpectedReturnPercent;
+
+        // saves to db.
+        await dbContext.SaveChangesAsync();
+        return true;
+    }
+
     // Method to delete one scenario for a specific user. Returns true if successful.
     public async Task<bool> DeleteScenario(int id, string userId)
     {
