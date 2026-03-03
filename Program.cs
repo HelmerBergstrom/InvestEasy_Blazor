@@ -12,6 +12,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Registers a named HttpClient for Finnhub using BaseUrl from appsettings.
+builder.Services.AddHttpClient("FinnhubClient", (sp, client) =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    var baseUrl = config["Finnhub:BaseUrl"];
+    client.BaseAddress = new Uri(baseUrl!);
+});
+
+// registers MarketService for communication with api
+builder.Services.AddScoped<MarketService>();
+
 builder.Services.AddScoped<ICalculatorService, CalculatorService>();
 builder.Services.AddScoped<SavingScenarioService>();
 builder.Services.AddScoped<CurrentUserService>();

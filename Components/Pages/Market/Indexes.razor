@@ -1,12 +1,72 @@
 @page "/market/indexes"
 @using Microsoft.AspNetCore.Components.Routing
+@using InvestEasy.Services
+@using InvestEasy.Models
+@inject MarketService MarketService
 
 <PageTitle> Indexes </PageTitle>
 
 <div class="page-header">
     <h1 class="page-title"> Indexes </h1>
-    <p class="page-subtitle"> Explore the indexes
+    <p class="page-subtitle">
+        A quick overview of major market benchmarks and assets.
     </p>
 </div>
 
 <MarketMenu />
+
+@if (isLoading)
+{
+    <p>Loading indexes...</p>
+}
+else
+{
+    @foreach (IndexItem index in indexes)
+    {
+        {/* Renders each index or asset with its current daily change. */}
+        <div class="index-card">
+            <h3>@index.Name</h3>
+            <p>
+                Change:
+                <span class="@(index.Quote?.D >= 0 ? "positive" : "negative")">
+                    @index.Quote?.Dp.ToString(format: "0.00")%
+                </span>
+            </p>
+        </div>
+    }
+}
+
+@code {
+    private bool isLoading = true;
+
+    private List<IndexItem> indexes = new List<IndexItem>()
+{
+new IndexItem() { Name = "S&P 500", Symbol = "SPY" },
+new IndexItem() { Name = "NASDAQ", Symbol = "QQQ" },
+new IndexItem() { Name = "DAX", Symbol = "DAX" },
+new IndexItem() { Name = "GOLD", Symbol = "GLD" },
+new IndexItem() { Name = "SILVER", Symbol = "SLV" },
+new IndexItem() { Name = "OIL", Symbol = "USO" },
+new IndexItem() { Name = "BITCOIN", Symbol = "IBIT" }
+};
+
+    // Fetches latest quote data for each index when page loads
+    protected override async Task OnInitializedAsync()
+    {
+        foreach (IndexItem index in indexes)
+        {
+            index.Quote = await MarketService.GetIndexQuoteAsync(index.Symbol);
+        }
+
+        isLoading = false;
+    }
+
+    // Simple view model representing an index/asset and its latest quote/numbers
+    public class IndexItem
+    {
+        public string Name { get; set; } = "";
+        public string Symbol { get; set; } = "";
+        public IndexQuote? Quote { get; set; }
+    }
+
+}
