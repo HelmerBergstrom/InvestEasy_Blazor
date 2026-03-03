@@ -1,0 +1,15 @@
+.home-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 70px;
+}
+
+.logo {
+    border: 5px solid #ffffff;
+    width: 400px;
+    height: auto;
+    border-radius: 50%;
+    transition: opacity 0.2s ease;
+    opacity: 0.9;
+}

@@ -1,0 +1,25 @@
+.market-menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 50px;
+    border-top: 1px solid #ffffff24;
+    border-bottom: 1px solid #ffffff24;
+    margin-top: 30px;
+}
+
+.nav-item {
+    color: white;
+    font-weight: 600;
+    font-size: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.nav-item ::deep a.active {
+    text-decoration: underline;
+}
+
+.nav-item ::deep .nav-link:hover {
+    text-decoration: underline;
+}

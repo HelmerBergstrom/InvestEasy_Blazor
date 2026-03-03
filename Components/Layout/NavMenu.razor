@@ -3,11 +3,6 @@
 @inject NavigationManager NavigationManager
 
 <header class="nav-container">
-
-    <NavLink href="/" Match="NavLinkMatch.All" class="nav-logo">
-        <img src="images/logo.png" class="logo" alt="Logotyp">
-    </NavLink>
-
     <nav class="nav-links">
         <div class="nav-item px-3">
             <NavLink href="/" class="nav-link" Match="NavLinkMatch.All" ActiveClass="active">
@@ -18,6 +13,11 @@
         <div class="nav-item px-3">
             <NavLink href="/education" class="nav-link" ActiveClass="active">
                 Academy
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink href="/market" class="nav-link" ActiveClass="active" aria-hidden="true">
+                Markets
             </NavLink>
         </div>
         <div class="nav-item px-3">
