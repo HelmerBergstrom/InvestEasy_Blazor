@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using InvestEasy.Models;
 
 namespace InvestEasy.Services;
@@ -27,15 +28,26 @@ public class MarketService
 
         return response;
     }
-
-    // returns latest news for a category, example "general" or "forex"
     public async Task<List<NewsArticle>> GetMarketNewsAsync(string category = "general")
     {
         var client = _httpFactory.CreateClient("FinnhubClient");
         var apiKey = _config["Finnhub:ApiKey"];
 
-        var items = await client.GetFromJsonAsync<List<NewsArticle>>(
-            $"news?category={category}&token={apiKey}");
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            throw new Exception("ApiKey is missing. Check appsettings.json!");
+        }
+
+        var url = $"news?category={category}&token={apiKey}";
+
+        var response = await client.GetAsync(url);
+        var json = await response.Content.ReadAsStringAsync();
+
+        // Deserialize from json-text to C#-object.
+        var items = JsonSerializer.Deserialize<List<NewsArticle>>(
+            json,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        );
 
         return items ?? new List<NewsArticle>();
     }

@@ -1,4 +1,7 @@
 @page "/market"
+@using InvestEasy.Models
+@using InvestEasy.Services
+@inject MarketService MarketService
 @using Microsoft.AspNetCore.Components.Routing
 
 <PageTitle> Markets </PageTitle>
@@ -6,12 +9,73 @@
 <div class="page-header">
     <h1 class="page-title"> Market News </h1>
     <p class="page-subtitle">
-        Stay updated with the latest financial market developments.
+        Stay updated with the latest news that may or may not impact the stock market.
     </p>
 </div>
 
 <MarketMenu />
+@if (isLoading)
+{
+    <p style="color: white">Loading news…</p>
+}
+else if (!string.IsNullOrWhiteSpace(error))
+{
+    <p style="color:#fd5959">@error</p>
+}
+else if (articles.Count == 0)
+{
+    <p>No news available.</p>
+}
+else
+{
+    @foreach (NewsArticle a in articles)
+    {
+        <article>
+            <div>
+                <span>@(a.Source)</span>
+                <span> - </span>
+                <span>@ToLocalTime(a.Datetime)</span>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(a.Url))
+            {
+                <div>
+                    <a href="@a.Url"> @a.Headline </a>
+                </div>
+            }
+            else
+            {
+                <div> @a.Headline </div>
+            }
+        </article>
+    }
+}
 
 @code {
+    private bool isLoading = true;
+    private string? error;
+    private List<NewsArticle> articles = new List<NewsArticle>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // gets articles from category "general".
+            articles = await MarketService.GetMarketNewsAsync(category: "general");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    // convert date which is unixtime in API, unix-timestamp = seconds passed after 1970-01-01.
+    // Converts to DateTime UTC first, then LocalTime and at last to a string for UI purposes.
+    private static string ToLocalTime(long unixSeconds)
+    => DateTimeOffset.FromUnixTimeSeconds(unixSeconds)
+    .ToLocalTime()
+    .ToString(format: "yyyy-MM-dd HH:mm");
 }
