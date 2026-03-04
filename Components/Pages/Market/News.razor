@@ -1,4 +1,4 @@
-@page "/market"
+@page "/market/news"
 @using InvestEasy.Models
 @using InvestEasy.Services
 @inject MarketService MarketService
@@ -6,49 +6,40 @@
 
 <PageTitle> Markets </PageTitle>
 
-<div class="page-header">
-    <h1 class="page-title"> Market News </h1>
-    <p class="page-subtitle">
-        Stay updated with the latest news that may or may not impact the stock market.
-    </p>
-</div>
-
 <MarketMenu />
-@if (isLoading)
-{
-    <p style="color: white">Loading news…</p>
-}
-else if (!string.IsNullOrWhiteSpace(error))
-{
-    <p style="color:#fd5959">@error</p>
-}
-else if (articles.Count == 0)
-{
-    <p>No news available.</p>
-}
-else
-{
-    @foreach (NewsArticle a in articles)
+
+<section class="news-container">
+    @if (isLoading)
     {
-        <article>
-            <div>
-                <span>@(a.Source)</span>
-                <span> - </span>
-                <span>@ToLocalTime(a.Datetime)</span>
-            </div>
-            @if (!string.IsNullOrWhiteSpace(a.Url))
-            {
-                <div>
-                    <a href="@a.Url"> @a.Headline </a>
-                </div>
-            }
-            else
-            {
-                <div> @a.Headline </div>
-            }
-        </article>
+        <p style="color: white"> Loading news... </p>
     }
-}
+    else if (!string.IsNullOrWhiteSpace(error))
+    {
+        <p style="color:#fd5959"> @error </p>
+    }
+    else if (articles.Count == 0)
+    {
+        <p> No news available. </p>
+    }
+    else
+    {
+        @foreach (NewsArticle a in articles)
+        {
+            <a href="@a.Url" class="news-link-wrapper">
+                <article>
+                    <div class="source-date">
+                        <span>@(a.Source)</span>
+                        <span> - </span>
+                        <span>@ToLocalTime(a.Datetime)</span>
+                    </div>
+                    <div class="headline">
+                        @a.Headline
+                    </div>
+                </article>
+            </a>
+        }
+    }
+</section>
 
 @code {
     private bool isLoading = true;
