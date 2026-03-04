@@ -15,30 +15,36 @@
 
 <MarketMenu />
 
-@if (isLoading)
+@foreach (IndexItem index in indexes)
 {
-    <p>Loading indexes...</p>
-}
-else
-{
-    @foreach (IndexItem index in indexes)
-    {
-        {/* Renders each index or asset with its current daily change. */}
-        <div class="index-card">
-            <h3>@index.Name</h3>
-            <p>
-                Change:
-                <span class="@(index.Quote?.D >= 0 ? "positive" : "negative")">
-                    @index.Quote?.Dp.ToString(format: "0.00")%
-                </span>
-            </p>
-        </div>
-    }
+    <div class="index-card">
+        <h3>@index.Name</h3>
+        @if (index.Quote is null)
+        {
+            <span class="loading"> Loading... </span>
+        }
+        else
+        {
+            <span class="@(index.Quote.D >= 0 ? "positive" : "negative")">
+                @index.Quote.Dp.ToString("0.00")%
+            </span>
+        }
+    </div>
 }
 
 @code {
-    private bool isLoading = true;
 
+    // Fetches all quotes in parallel, and updates each card as data arrives instead of waiting for everything to arrive.
+    protected override async Task OnInitializedAsync()
+    {
+        IEnumerable<Task>? tasks = indexes.Select(async index =>
+        {
+            index.Quote = await MarketService.GetIndexQuoteAsync(index.Symbol);
+            await InvokeAsync(StateHasChanged);
+        });
+
+        await Task.WhenAll(tasks);
+    }
     private List<IndexItem> indexes = new List<IndexItem>()
 {
 new IndexItem() { Name = "S&P 500", Symbol = "SPY" },
@@ -49,17 +55,6 @@ new IndexItem() { Name = "SILVER", Symbol = "SLV" },
 new IndexItem() { Name = "OIL", Symbol = "USO" },
 new IndexItem() { Name = "BITCOIN", Symbol = "IBIT" }
 };
-
-    // Fetches latest quote data for each index when page loads
-    protected override async Task OnInitializedAsync()
-    {
-        foreach (IndexItem index in indexes)
-        {
-            index.Quote = await MarketService.GetIndexQuoteAsync(index.Symbol);
-        }
-
-        isLoading = false;
-    }
 
     // Simple view model representing an index/asset and its latest quote/numbers
     public class IndexItem

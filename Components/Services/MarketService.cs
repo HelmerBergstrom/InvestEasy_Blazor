@@ -27,4 +27,16 @@ public class MarketService
 
         return response;
     }
+
+    // returns latest news for a category, example "general" or "forex"
+    public async Task<List<NewsArticle>> GetMarketNewsAsync(string category = "general")
+    {
+        var client = _httpFactory.CreateClient("FinnhubClient");
+        var apiKey = _config["Finnhub:ApiKey"];
+
+        var items = await client.GetFromJsonAsync<List<NewsArticle>>(
+            $"news?category={category}&token={apiKey}");
+
+        return items ?? new List<NewsArticle>();
+    }
 }

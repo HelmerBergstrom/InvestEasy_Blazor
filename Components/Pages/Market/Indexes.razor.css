@@ -36,6 +36,11 @@
     font-weight: 700;
 }
 
+.loading {
+    text-align: center;
+    color: white;
+}
+
 @media (max-width: 1040px) {
     .index-card {
         flex-direction: column;
