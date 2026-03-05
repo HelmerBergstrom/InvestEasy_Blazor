@@ -1,6 +1,65 @@
 @page "/market/stocks"
 @using Microsoft.AspNetCore.Components.Routing
+@using InvestEasy.Services
+@using InvestEasy.Models
+@inject MarketService MarketService
 
 <PageTitle> Stocks </PageTitle>
 
 <MarketMenu />
+
+<input type="search">
+
+<h2> Popular stocks </h2>
+
+@foreach (IndexItem index in indexes)
+{
+    <div class="index-card">
+        <h3>@index.Name</h3>
+        @if (index.Quote is null)
+        {
+            <span class="loading"> Loading... </span>
+        }
+        else
+        {
+            <p> @index.Quote.C </p>
+            <span class="@(index.Quote.D >= 0 ? "positive" : "negative")">
+                @index.Quote.Dp.ToString("0.00")%
+            </span>
+        }
+    </div>
+}
+
+@code {
+
+    // Fetches all quotes in parallel, and updates each card as data arrives instead of waiting for everything to arrive.
+    protected override async Task OnInitializedAsync()
+    {
+        IEnumerable<Task>? tasks = indexes.Select(async index =>
+        {
+            index.Quote = await MarketService.GetIndexQuoteAsync(index.Symbol);
+            await InvokeAsync(StateHasChanged);
+        });
+
+        await Task.WhenAll(tasks);
+    }
+    private List<IndexItem> indexes = new List<IndexItem>()
+{
+new IndexItem() { Name = "Apple Inc.", Symbol = "AAPL" },
+new IndexItem() { Name = "Microsoft Corporation", Symbol = "MSFT" },
+new IndexItem() { Name = "Nvidia Corporation", Symbol = "NVDA" },
+new IndexItem() { Name = "Amazon.com, Inc.", Symbol = "AMZN" },
+new IndexItem() { Name = "Alphabet Inc.", Symbol = "GOOG" },
+new IndexItem() { Name = "Meta Plattforms, Inc.", Symbol = "META" },
+new IndexItem() { Name = "Tesla, Inc.", Symbol = "TSLA" }
+};
+
+    // Simple view model representing an index/asset and its latest quote/numbers
+    public class IndexItem
+    {
+        public string Name { get; set; } = "";
+        public string Symbol { get; set; } = "";
+        public IndexQuote? Quote { get; set; }
+    }
+
+}
