@@ -4,27 +4,24 @@
 @using InvestEasy.Models
 @inject MarketService MarketService
 
-<PageTitle> Stocks </PageTitle>
+<PageTitle> Popular Stocks </PageTitle>
 
 <MarketMenu />
-
-<input type="search">
-
-<h2> Popular stocks </h2>
 
 @foreach (IndexItem index in indexes)
 {
     <div class="index-card">
-        <h3>@index.Name</h3>
+        <h2>@index.Name</h2>
         @if (index.Quote is null)
         {
             <span class="loading"> Loading... </span>
         }
         else
         {
-            <p> @index.Quote.C </p>
-            <span class="@(index.Quote.D >= 0 ? "positive" : "negative")">
-                @index.Quote.Dp.ToString("0.00")%
+            <span>
+                <p> Current price: @index.Quote.C.ToString(format: "0.00") </p>
+                <p> Change: <span class="@(index.Quote.D >= 0 ? "positive" : "negative")"> @index.Quote.Dp.ToString("0.00")%
+                    </span></p>
             </span>
         }
     </div>
@@ -54,7 +51,7 @@ new IndexItem() { Name = "Meta Plattforms, Inc.", Symbol = "META" },
 new IndexItem() { Name = "Tesla, Inc.", Symbol = "TSLA" }
 };
 
-    // Simple view model representing an index/asset and its latest quote/numbers
+    // Simple view model representing a stock and its latest quote/numbers
     public class IndexItem
     {
         public string Name { get; set; } = "";

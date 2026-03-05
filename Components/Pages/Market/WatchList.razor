@@ -1,0 +1,12 @@
+@page "/market/watchlist"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+@using Microsoft.AspNetCore.Components.Routing
+@using InvestEasy.Services
+@using InvestEasy.Models
+@inject MarketService MarketService
+
+<PageTitle> My Watchlist </PageTitle>
+
+<MarketMenu />

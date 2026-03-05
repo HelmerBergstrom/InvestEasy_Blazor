@@ -20,8 +20,24 @@
         </div>
         <div class="nav-item">
             <NavLink href="/market/stocks" class="nav-link" ActiveClass="active">
-                Stocks
+                Popular stocks
             </NavLink>
         </div>
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav-item">
+                    <NavLink href="/market/watchlist" class="nav-link" ActiveClass="active">
+                        My watchlist
+                    </NavLink>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="nav-item">
+                    <NavLink href="Account/Login" class="nav-link">
+                        My watchlist 🔒
+                    </NavLink>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 </div>

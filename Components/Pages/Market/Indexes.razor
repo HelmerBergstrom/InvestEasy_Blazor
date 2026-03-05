@@ -18,8 +18,9 @@
         }
         else
         {
-            <span class="@(index.Quote.D >= 0 ? "positive" : "negative")">
-                @index.Quote.Dp.ToString("0.00")%
+            <span>
+                <p> Change: <span class="@(index.Quote.D >= 0 ? "positive" : "negative")"> @index.Quote.Dp.ToString("0.00")%
+                    </span></p>
             </span>
         }
     </div>
