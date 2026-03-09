@@ -38,14 +38,18 @@
 }
 
 .message-text {
+    flex-basis: 100%;
+    text-align: center;
     margin: auto;
-    background-color: green;
+    font-size: 1.2rem;
     padding: 1rem 2rem;
+    background-color: #1e293b;
+    border-radius: 10px;
     color: rgb(255, 255, 255);
 }
 
 .watchlist h2 {
-    margin: 2rem 0 1rem 0;
+    margin: 2rem 0 0.5rem 0;
     font-size: 1.6rem;
     flex-basis: 100%;
     text-align: center;
@@ -78,13 +82,20 @@
     margin-bottom: 0;
 }
 
-.index-card:hover {
-    background: #111c35;
-    border-color: #334155;
+.btn-success {
+    min-width: 110px;
 }
 
-.btn-success {
-    min-width: 90px;
+.btn-success:hover {
+    font-weight: 700;
+}
+
+.btn-danger {
+    min-width: 110px;
+}
+
+.btn-danger:hover {
+    font-weight: 700;
 }
 
 @media (max-width: 1100px) {

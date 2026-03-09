@@ -18,7 +18,8 @@
 
 <section class="watchlist">
 
-    <input placeholder="Search stocks (Apple, Microsoft...)" @bind="searchQuery" class="form-control" />
+    <input placeholder="Search stocks (Apple, Microsoft...)" @bind="searchQuery" @bind:event="oninput"
+        @onclick="ClearMessage" class="form-control" />
     <button class="btn btn-primary" @onclick="SearchAsync" disabled="@isSearching">
         @(isSearching ? "Searching..." : "Search")
     </button>
@@ -37,7 +38,7 @@
                 </div>
 
                 <button class="btn btn-success" @onclick="() => AddToWatchlist(result)">
-                    Add
+                    ADD
                 </button>
             </div>
         }
@@ -66,7 +67,7 @@
                 </div>
 
                 <button class="btn btn-danger" @onclick="() => RemoveFromWatchList(item.Id)">
-                    Remove
+                    REMOVE
                 </button>
             </div>
         }
@@ -76,11 +77,11 @@
 
 @code {
     private List<WatchListItemModel> watchListItems = new List<WatchListItemModel>();
+    private List<SymbolSearchItem> searchResults = new List<SymbolSearchItem>();
+
     private string? message;
     private string searchQuery = "";
     private bool isSearching;
-
-    private List<SymbolSearchItem> searchResults = new List<SymbolSearchItem>();
 
     // loading watchlist when component is active.
     protected override async Task OnInitializedAsync()
@@ -99,8 +100,16 @@
 
         watchListItems = await WatchListService.GetForUserAsync(userId);
     }
+
+    private void ClearMessage()
+    {
+        message = null;
+    }
+
     private async Task SearchAsync()
     {
+        message = null;
+
         // Validation of input.
         if (string.IsNullOrWhiteSpace(searchQuery))
         {
@@ -148,8 +157,11 @@
         item.Type
         );
 
-        // message depending on if added is true or false.
-        message = added ? "Stock added to watchlist." : "This stock is already in your watchlist.";
+        message = added ? "Stock added to watchlist." : "That stock is already in your watchlist.";
+
+        // reset search UI after adding
+        searchQuery = "";
+        searchResults.Clear();
 
         await LoadWatchListAsync();
     }
