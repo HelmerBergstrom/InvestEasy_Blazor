@@ -28,6 +28,8 @@ public class MarketService
 
         return response;
     }
+
+    // GET´s market news articles.
     public async Task<List<NewsArticle>> GetMarketNewsAsync(string category = "general")
     {
         var client = _httpFactory.CreateClient("FinnhubClient");
@@ -38,6 +40,7 @@ public class MarketService
             throw new Exception("ApiKey is missing. Check appsettings.json!");
         }
 
+        // category = general. 
         var url = $"news?category={category}&token={apiKey}";
 
         var response = await client.GetAsync(url);
@@ -52,6 +55,7 @@ public class MarketService
         return items ?? new List<NewsArticle>();
     }
 
+    // search for symbol with stock name.
     public async Task<List<SymbolSearchItem>> SearchSymbolAsync(string query)
     {
         if (string.IsNullOrEmpty(query))
@@ -62,7 +66,7 @@ public class MarketService
         var client = _httpFactory.CreateClient("FinnhubClient");
         var apiKey = _config["Finnhub:ApiKey"];
 
-        var url = $"search?={Uri.EscapeDataString(query.Trim())}&token={apiKey}";
+        var url = $"search?q={Uri.EscapeDataString(query.Trim())}&token={apiKey}";
         var res = await client.GetFromJsonAsync<SymbolSearchResponse>(url);
 
         return res?.Result ?? new();

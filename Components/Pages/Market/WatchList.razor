@@ -1,7 +1,7 @@
 @page "/market/watchlist"
+@rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
-
 @using Microsoft.AspNetCore.Components.Routing
 @using InvestEasy.Services
 @using InvestEasy.Models
@@ -10,3 +10,78 @@
 <PageTitle> My Watchlist </PageTitle>
 
 <MarketMenu />
+
+<section class="watchlist-search">
+
+    <input placeholder="Search stocks (Apple, Microsoft...)" @bind="searchQuery" class="form-control" />
+    <button class="btn btn-primary" @onclick="SearchAsync" disabled="@isSearching">
+        @(isSearching ? "Searching..." : "Search")
+    </button>
+
+
+    @if (searchResults.Count > 0)
+    {
+        <h3> Search Results </h3>
+
+        @foreach (SymbolSearchItem result in searchResults.Take(count: 10))
+        {
+            <div class="index-card">
+
+                <div>
+                    <strong>@result.Description</strong>
+                    <div>@result.Symbol - @result.Type</div>
+                    <div>@result.DisplaySymbol</div>
+                </div>
+
+                <button class="btn btn-success" @onclick="() => AddToWatchlist(result)">
+                    Add
+                </button>
+
+            </div>
+        }
+    }
+</section>
+
+@code {
+
+    private string searchQuery = "";
+    private bool isSearching;
+
+    private List<SymbolSearchItem> searchResults = new List<SymbolSearchItem>();
+
+    private async Task SearchAsync()
+    {
+        // Validation of input.
+        if (string.IsNullOrWhiteSpace(searchQuery))
+        {
+            searchResults.Clear();
+            return;
+        }
+
+        // set searching to true.
+        isSearching = true;
+
+        try
+        {
+            searchResults = await MarketService.SearchSymbolAsync(searchQuery);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            searchResults = new List<SymbolSearchItem>();
+        }
+        finally
+        {
+            isSearching = false;
+            // Notifies the component that its state has changed.
+            // When applicable, this will cause the component to be re-rendered.
+            StateHasChanged();
+        }
+    }
+
+    // adding a stock to users watchlist.
+    private async Task AddToWatchlist(SymbolSearchItem item)
+    {
+    }
+
+}

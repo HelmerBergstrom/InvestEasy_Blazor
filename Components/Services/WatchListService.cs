@@ -17,7 +17,4 @@ public class WatchListService
     {
         return await _db.WatchListItems.Where(item => item.UserId == userId).ToListAsync();
     }
-
-
-
 }

@@ -20,8 +20,9 @@ builder.Services.AddHttpClient("FinnhubClient", (sp, client) =>
     client.BaseAddress = new Uri(baseUrl!);
 });
 
-// registers MarketService for communication with api
+// registers MarketService for communication with api and watchlistservice.
 builder.Services.AddScoped<MarketService>();
+builder.Services.AddScoped<WatchListService>();
 
 builder.Services.AddScoped<ICalculatorService, CalculatorService>();
 builder.Services.AddScoped<SavingScenarioService>();
