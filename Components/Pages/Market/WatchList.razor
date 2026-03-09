@@ -1,27 +1,31 @@
 @page "/market/watchlist"
 @rendermode InteractiveServer
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Components.Routing
 @using InvestEasy.Services
 @using InvestEasy.Models
+@inject AuthenticationStateProvider AuthStateProvider
+@inject CurrentUserService CurrentUserService
 @inject MarketService MarketService
+@inject WatchListService WatchListService
 
 <PageTitle> My Watchlist </PageTitle>
 
 <MarketMenu />
 
-<section class="watchlist-search">
+<section class="watchlist">
 
     <input placeholder="Search stocks (Apple, Microsoft...)" @bind="searchQuery" class="form-control" />
     <button class="btn btn-primary" @onclick="SearchAsync" disabled="@isSearching">
         @(isSearching ? "Searching..." : "Search")
     </button>
 
-
     @if (searchResults.Count > 0)
     {
-        <h3> Search Results </h3>
+        <h2> Search Results </h2>
 
         @foreach (SymbolSearchItem result in searchResults.Take(count: 10))
         {
@@ -29,26 +33,72 @@
 
                 <div>
                     <strong>@result.Description</strong>
-                    <div>@result.Symbol - @result.Type</div>
-                    <div>@result.DisplaySymbol</div>
+                    <p>@result.Symbol - @result.Type</p>
                 </div>
 
                 <button class="btn btn-success" @onclick="() => AddToWatchlist(result)">
                     Add
                 </button>
-
             </div>
         }
     }
+
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <p class="message-text">@message</p>
+    }
+
+    <h2> My Watchlist </h2>
+
+
+    @if (watchListItems.Count == 0)
+    {
+        <p> No saved stocks yet. Search and find stocks to add to the watchlist. </p>
+    }
+    else
+    {
+        @foreach (WatchListItemModel item in watchListItems)
+        {
+            <div class="index-card">
+                <div>
+                    <strong>@item.Name</strong>
+                    <p>@item.Symbol - @item.Type</p>
+                </div>
+
+                <button class="btn btn-danger" @onclick="() => RemoveFromWatchList(item.Id)">
+                    Remove
+                </button>
+            </div>
+        }
+    }
+
 </section>
 
 @code {
-
+    private List<WatchListItemModel> watchListItems = new List<WatchListItemModel>();
+    private string? message;
     private string searchQuery = "";
     private bool isSearching;
 
     private List<SymbolSearchItem> searchResults = new List<SymbolSearchItem>();
 
+    // loading watchlist when component is active.
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadWatchListAsync();
+    }
+
+    private async Task LoadWatchListAsync()
+    {
+        string? userId = await CurrentUserService.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+        watchListItems = await WatchListService.GetForUserAsync(userId);
+    }
     private async Task SearchAsync()
     {
         // Validation of input.
@@ -58,7 +108,7 @@
             return;
         }
 
-        // set searching to true.
+        // set searching to true to disable button.
         isSearching = true;
 
         try
@@ -79,9 +129,42 @@
         }
     }
 
-    // adding a stock to users watchlist.
+    // add a stock to watchlist.
     private async Task AddToWatchlist(SymbolSearchItem item)
     {
+        // gets userId.
+        string? userId = await CurrentUserService.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+        // new watchlist item.
+        bool added = await WatchListService.AddAsync(
+        userId,
+        item.Symbol ?? "",
+        item.Description ?? "",
+        item.Type
+        );
+
+        // message depending on if added is true or false.
+        message = added ? "Stock added to watchlist." : "This stock is already in your watchlist.";
+
+        await LoadWatchListAsync();
     }
 
+    // remove one stock from watchlist via id and userId.
+    private async Task RemoveFromWatchList(int id)
+    {
+        string? userId = await CurrentUserService.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+        await WatchListService.RemoveAsync(userId, id);
+        await LoadWatchListAsync();
+    }
 }

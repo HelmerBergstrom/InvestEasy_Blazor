@@ -14,7 +14,7 @@ public class CurrentUserService
     }
 
     // Gets userId via AuthenticationState, which "Provides information about the currently authenticated user, if any."
-    public async Task<string?> GetUserId()
+    public async Task<string?> GetUserIdAsync()
     {
         var authState = await _authStateProvider.GetAuthenticationStateAsync();
 

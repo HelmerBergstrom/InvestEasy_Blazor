@@ -35,7 +35,7 @@ public partial class SavingCalc
     // gets all saved scenarios when component is ready to start
     protected override async Task OnInitializedAsync()
     {
-        var userId = await CurrentUserService.GetUserId();
+        var userId = await CurrentUserService.GetUserIdAsync();
 
         if (string.IsNullOrWhiteSpace(userId))
             return;
@@ -103,7 +103,7 @@ public partial class SavingCalc
             return;
         }
 
-        var userId = await CurrentUserService.GetUserId();
+        var userId = await CurrentUserService.GetUserIdAsync();
         if (string.IsNullOrWhiteSpace(userId))
         {
             saveError = "Couldn´t identify user. Log in again.";
@@ -159,7 +159,7 @@ public partial class SavingCalc
             return;
         }
 
-        var userId = await CurrentUserService.GetUserId();
+        var userId = await CurrentUserService.GetUserIdAsync();
         if (string.IsNullOrWhiteSpace(userId))
         {
             saveError = "Couldn't identify user. Please log in again.";
@@ -199,7 +199,7 @@ public partial class SavingCalc
         saveMessage = null;
 
         // Gets user and validates user.
-        var userId = await CurrentUserService.GetUserId();
+        var userId = await CurrentUserService.GetUserIdAsync();
         if (string.IsNullOrWhiteSpace(userId))
         {
             saveError = "Couldn´t identify user. Please log in again.";
