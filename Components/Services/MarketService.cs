@@ -51,4 +51,20 @@ public class MarketService
 
         return items ?? new List<NewsArticle>();
     }
+
+    public async Task<List<SymbolSearchItem>> SearchSymbolAsync(string query)
+    {
+        if (string.IsNullOrEmpty(query))
+        {
+            return new();
+        }
+
+        var client = _httpFactory.CreateClient("FinnhubClient");
+        var apiKey = _config["Finnhub:ApiKey"];
+
+        var url = $"search?={Uri.EscapeDataString(query.Trim())}&token={apiKey}";
+        var res = await client.GetFromJsonAsync<SymbolSearchResponse>(url);
+
+        return res?.Result ?? new();
+    }
 }
