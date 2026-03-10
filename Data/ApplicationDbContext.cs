@@ -8,6 +8,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<SavingScenarioModel> SavingScenarios { get; set; }
     public DbSet<WatchListItemModel> WatchListItems { get; set; }
-    public DbSet<RiskProfileModel> RiskProfiles { get; set; }
     public DbSet<UserProgressModel> UserProgresses { get; set; }
+    public DbSet<RiskProfileModel> RiskProfiles { get; set; }
 }
