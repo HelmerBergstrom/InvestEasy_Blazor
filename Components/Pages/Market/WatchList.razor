@@ -61,13 +61,25 @@
         @foreach (WatchListItemModel item in watchListItems)
         {
             <div class="index-card">
-                <div>
+                <div class="index-card-text">
                     <strong>@item.Name</strong>
                     <p>@item.Symbol - @item.Type</p>
                 </div>
 
-                <button class="btn btn-danger" @onclick="() => RemoveFromWatchList(item.Id)">
-                    REMOVE
+                <div class="index-card-values">
+                    @if (watchlistQuotes.TryGetValue(item.Symbol, out IndexQuote? quote) && quote is not null)
+                    {
+                        <p><strong>@quote.C.ToString("0.00")</strong></p>
+                        <span class="@(quote.D >= 0 ? "positive" : "negative")">
+                            @quote.D.ToString("0.00")
+                            (@quote.Dp.ToString("0.00")%)
+                        </span>
+
+                    }
+                </div>
+
+                <button class="btn btn-secondary" @onclick="() => RemoveFromWatchList(item.Id)">
+                    🗑️
                 </button>
             </div>
         }
@@ -78,6 +90,7 @@
 @code {
     private List<WatchListItemModel> watchListItems = new List<WatchListItemModel>();
     private List<SymbolSearchItem> searchResults = new List<SymbolSearchItem>();
+    private Dictionary<string, IndexQuote?> watchlistQuotes = new Dictionary<string, IndexQuote?>();
 
     private string? message;
     private string searchQuery = "";
@@ -99,6 +112,16 @@
         }
 
         watchListItems = await WatchListService.GetForUserAsync(userId);
+
+        watchlistQuotes.Clear();
+
+        IEnumerable<Task> tasks = watchListItems.Select(async item =>
+        {
+            watchlistQuotes[item.Symbol] = await MarketService.GetIndexQuoteAsync(item.Symbol);
+            await InvokeAsync(StateHasChanged);
+        });
+
+        await Task.WhenAll(tasks);
     }
 
     private void ClearMessage()
