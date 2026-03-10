@@ -490,3 +490,6 @@ appsettings.Development.json
 *.db
 *.db-shm
 *.db-wal
+Data/Migrations/20260310175210_UpdateUserProgressModel.Designer.cs
+.gitignore
+Data/Migrations/20260310175210_UpdateUserProgressModel.cs

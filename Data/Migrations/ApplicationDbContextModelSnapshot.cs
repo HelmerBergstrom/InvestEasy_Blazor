@@ -146,6 +146,22 @@ namespace InvestEasy.Migrations
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("CurrentLevel")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Level1Completed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Level2Completed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Level3Completed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");

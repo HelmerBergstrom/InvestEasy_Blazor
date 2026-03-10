@@ -26,6 +26,9 @@ builder.Services.AddScoped<WatchListService>();
 
 builder.Services.AddScoped<ICalculatorService, CalculatorService>();
 builder.Services.AddScoped<SavingScenarioService>();
+
+builder.Services.AddScoped<UserProgressService>();
+
 builder.Services.AddScoped<CurrentUserService>();
 
 builder.Services.AddCascadingAuthenticationState();

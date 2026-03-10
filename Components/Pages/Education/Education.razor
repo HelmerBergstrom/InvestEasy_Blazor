@@ -1,10 +1,105 @@
 @page "/education"
+@using Microsoft.AspNetCore.Authorization
+@using InvestEasy.Services
+@using InvestEasy.Models
+@attribute [Authorize]
+@inject UserProgressService UserProgressService
+@inject CurrentUserService CurrentUserService
 
-<PageTitle> Academy </PageTitle>
+<PageTitle>Academy</PageTitle>
 
-<div class="page-header">
-    <h1 class="page-title"> Academy </h1>
-    <p class="page-subtitle">
-        Learn the fundamentals of investing with InvestEasy´s Academy
-    </p>
-</div>
+@if (isLoading)
+{
+    <p> Loading... </p>
+}
+else if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <p> @errorMessage </p>
+}
+else if (progress is not null)
+{
+    <section>
+        <div class="page-header">
+            <h1 class="page-title"> Academy </h1>
+            <p class="page-subtitle">
+                Learn the fundamentals of investing with InvestEasy´s Academy
+            </p>
+        </div>
+
+        <div>
+            <h2> Level 1 </h2>
+            <p> Status: @(progress.Level1Completed ? "Completed" : "Available") </p>
+            <p> Unlocked: Yes </p>
+            <a href="/education/level1"> Go to Level 1 </a>
+        </div>
+
+        <div>
+            <h2> Level 2 </h2>
+            <p> Status: @(progress.Level2Completed ? "Completed" : (isLevel2Unlocked ? "Available" : "Locked")) </p>
+            <p> Unlocked: @(isLevel2Unlocked ? "Yes" : "No") </p>
+
+            @if (isLevel2Unlocked)
+            {
+                <a href="/education/level2"> Go to Level 2 </a>
+            }
+            else
+            {
+                <button type="button" disabled> Locked </button>
+            }
+        </div>
+
+        <div>
+            <h2> Level 3</h2>
+            <p> Status: @(progress.Level3Completed ? "Completed" : (isLevel3Unlocked ? "Available" : "Locked"))</p>
+            <p> Unlocked: @(isLevel3Unlocked ? "Yes" : "No")</p>
+
+            @if (isLevel3Unlocked)
+            {
+                <a href="/education/level3"> Go to Level 3 </a>
+            }
+            else
+            {
+                <button type="button" disabled> Locked </button>
+            }
+        </div>
+    </section>
+}
+
+@code {
+    private UserProgressModel? progress;
+    private bool isLoading = true;
+    private string? errorMessage;
+
+    private bool isLevel2Unlocked;
+    private bool isLevel3Unlocked;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // gets userId.
+            string? userId = await CurrentUserService.GetUserIdAsync();
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                errorMessage = "No user found.";
+                return;
+            }
+
+            // gets or creates progress
+            progress = await UserProgressService.GetOrCreateProgressAsync(userId);
+
+            // checks if level 2 and 3 are completed.
+            isLevel2Unlocked = UserProgressService.IsLevelUnlocked(progress, levelNumber: 2);
+            isLevel3Unlocked = UserProgressService.IsLevelUnlocked(progress, levelNumber: 3);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
