@@ -18,49 +18,96 @@ else if (!string.IsNullOrWhiteSpace(errorMessage))
 }
 else if (progress is not null)
 {
-    <section>
-        <div class="page-header">
-            <h1 class="page-title"> Academy </h1>
-            <p class="page-subtitle">
-                Learn the fundamentals of investing with InvestEasy´s Academy
+    <div class="page-header">
+        <h1 class="page-title"> Academy </h1>
+        <p class="page-subtitle">
+            Learn the fundamentals of investing with InvestEasy´s Academy
+        </p>
+    </div>
+
+    <section class="levels">
+
+        <div class="level-card available-card">
+            <div class="level-card-header">
+                <span class="level-badge"> Level 1 </span>
+                <span class="level-status completed-status">@(progress.Level1Completed ? "Completed" : "Available")</span>
+            </div>
+
+            <h2> The foundation </h2>
+            <p class="level-description">
+                Start with the core concepts of investing and build a strong foundation before
+                moving on to more advanced topics.
             </p>
+            <p>
+                <strong> Status:</strong>
+                @(progress.Level1Completed ? "Completed" : "Not completed")
+            </p>
+            <p><strong> Time required: </strong> 30 minutes </p>
+
+            <div class="level-footer">
+                <a class="btn btn-primary" href="/education/level1"> Take course </a>
+            </div>
         </div>
 
-        <div>
-            <h2> Level 1 </h2>
-            <p> Status: @(progress.Level1Completed ? "Completed" : "Available") </p>
-            <p> Unlocked: Yes </p>
-            <a href="/education/level1"> Go to Level 1 </a>
+        <div class="level-card @(isLevel2Unlocked ? "available-card" : "locked-card")">
+            <div class="level-card-header">
+                <span class="level-badge">Level 2</span>
+                <span class="level-status @(isLevel2Unlocked ? "available-status" : "locked-status")">
+                    @(progress.Level2Completed ? "Completed" : (isLevel2Unlocked ? "Not completed" : "Locked"))
+                </span>
+            </div>
+
+            <h2> Move forward </h2>
+            <p class="level-description">
+                Move on to risk, strategy, and portfolio thinking once the first level has been
+                completed.
+            </p>
+            <p>
+                <strong> Status:</strong>
+                @(progress.Level2Completed ? "Completed" : (isLevel2Unlocked ? "Not completed" : "Locked"))
+            </p>
+            <p><strong> Time required:</strong> 15 minutes</p>
+
+            <div class="level-footer">
+                @if (isLevel2Unlocked)
+                {
+                    <a class="btn btn-primary" href="/education/level2"> Go to Level 2 </a>
+                }
+                else
+                {
+                    <button class="btn btn-secondary" type="button" disabled> Locked </button>
+                }
+            </div>
         </div>
 
-        <div>
-            <h2> Level 2 </h2>
-            <p> Status: @(progress.Level2Completed ? "Completed" : (isLevel2Unlocked ? "Available" : "Locked")) </p>
-            <p> Unlocked: @(isLevel2Unlocked ? "Yes" : "No") </p>
+        <div class="level-card @(isLevel3Unlocked ? "available-card" : "locked-card")">
+            <div class="level-card-header">
+                <span class="level-badge">Level 3</span>
+                <span class="level-status @(isLevel3Unlocked ? "available-status" : "locked-status")">
+                    @(progress.Level3Completed ? "Completed" : (isLevel3Unlocked ? "Not completed" : "Locked"))
+                </span>
+            </div>
 
-            @if (isLevel2Unlocked)
-            {
-                <a href="/education/level2"> Go to Level 2 </a>
-            }
-            else
-            {
-                <button type="button" disabled> Locked </button>
-            }
-        </div>
+            <h2> Knowledge </h2>
+            <p class="level-description">
+                Apply your knowledge in a more advanced context and continue developing your investing understanding.
+            </p>
+            <p>
+                <strong> Status:</strong>
+                @(progress.Level3Completed ? "Completed" : (isLevel3Unlocked ? "Not completed" : "Locked"))
+            </p>
+            <p><strong> Time required:</strong> 20 minutes</p>
 
-        <div>
-            <h2> Level 3</h2>
-            <p> Status: @(progress.Level3Completed ? "Completed" : (isLevel3Unlocked ? "Available" : "Locked"))</p>
-            <p> Unlocked: @(isLevel3Unlocked ? "Yes" : "No")</p>
-
-            @if (isLevel3Unlocked)
-            {
-                <a href="/education/level3"> Go to Level 3 </a>
-            }
-            else
-            {
-                <button type="button" disabled> Locked </button>
-            }
+            <div class="level-footer">
+                @if (isLevel3Unlocked)
+                {
+                    <a class="btn btn-primary" href="/education/level3"> Go to Level 3 </a>
+                }
+                else
+                {
+                    <button class="btn btn-secondary" type="button" disabled> Locked </button>
+                }
+            </div>
         </div>
     </section>
 }
