@@ -20,13 +20,25 @@ public class MarketService
     // Calls Finnhub "quote endpoint". deserialize JSON into IndexQuote-model.
     public async Task<IndexQuote?> GetIndexQuoteAsync(string symbol)
     {
-        var client = _httpFactory.CreateClient("FinnhubClient");
-        var apiKey = _config["Finnhub:ApiKey"];
+        if (string.IsNullOrEmpty(symbol))
+        {
+            return null;
+        }
 
-        var response = await client.GetFromJsonAsync<IndexQuote>(
-            $"quote?symbol={symbol}&token={apiKey}");
+        try
+        {
+            var client = _httpFactory.CreateClient("FinnhubClient");
+            var apiKey = _config["Finnhub:ApiKey"];
 
-        return response;
+            var response = await client.GetFromJsonAsync<IndexQuote>(
+                $"quote?symbol={symbol}&token={apiKey}");
+
+            return response;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     // GET´s market news articles.
