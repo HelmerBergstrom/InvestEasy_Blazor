@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using InvestEasy.Models;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace InvestEasy.Services;
 
@@ -9,12 +10,14 @@ public class MarketService
 {
     private readonly IHttpClientFactory _httpFactory;
     private readonly IConfiguration _config;
+    private readonly IMemoryCache _cache;
 
     // Injects HttpClientFactory and config for API key and base URL.
-    public MarketService(IHttpClientFactory httpFactory, IConfiguration config)
+    public MarketService(IHttpClientFactory httpFactory, IConfiguration config, IMemoryCache cache)
     {
         _httpFactory = httpFactory;
         _config = config;
+        _cache = cache;
     }
 
     // Calls Finnhub "quote endpoint". deserialize JSON into IndexQuote-model.
@@ -25,13 +28,32 @@ public class MarketService
             return null;
         }
 
+        symbol = symbol.Trim().ToUpperInvariant();
+        string cacheKey = $"quote:{symbol}";
+
+        // checks if the quote exists in the in-memory cache.
+        // if exists, it returns the cached value instead of calling API.
+        if (_cache.TryGetValue(cacheKey, out IndexQuote? cachedQuote))
+        {
+            Console.WriteLine($"Using cached quote for {symbol}");
+            return cachedQuote;
+        }
+
+        Console.WriteLine($"Calling Finnhub API for {symbol}");
         try
         {
             var client = _httpFactory.CreateClient("FinnhubClient");
             var apiKey = _config["Finnhub:ApiKey"];
 
+
             var response = await client.GetFromJsonAsync<IndexQuote>(
                 $"quote?symbol={symbol}&token={apiKey}");
+
+            // if response is good, store it in cache for 60sec to reduce API calls.
+            if (response is not null)
+            {
+                _cache.Set(cacheKey, response, TimeSpan.FromSeconds(60));
+            }
 
             return response;
         }

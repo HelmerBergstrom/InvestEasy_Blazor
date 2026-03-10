@@ -488,3 +488,5 @@ appsettings.Development.json
 /bin
 
 *.db
+*.db-shm
+*.db-wal
