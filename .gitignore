@@ -486,3 +486,5 @@ appsettings.Development.json
 
 /obj
 /bin
+
+*.db
