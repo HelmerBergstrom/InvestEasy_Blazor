@@ -16,5 +16,40 @@ public class RiskProfileService
             model.MinimalRiskPercentage = 100;
             return;
         }
+
+        model.TotalScore =
+        model.TimeHorizon +
+        model.MarketDropReaction +
+        model.InvestmentGoal +
+        model.ExperienceLevel;
+
+        if (model.TotalScore <= 3)
+        {
+            model.ProfileName = "Very Low Risk";
+            model.StocksPercentage = 0;
+            model.FundsPercentage = 0;
+            model.MinimalRiskPercentage = 100;
+        }
+        else if (model.TotalScore <= 6)
+        {
+            model.ProfileName = "Low Risk";
+            model.StocksPercentage = 20;
+            model.FundsPercentage = 50;
+            model.MinimalRiskPercentage = 30;
+        }
+        else if (model.TotalScore <= 9)
+        {
+            model.ProfileName = "Moderate Risk";
+            model.StocksPercentage = 30;
+            model.FundsPercentage = 70;
+            model.MinimalRiskPercentage = 0;
+        }
+        else
+        {
+            model.ProfileName = "High Risk";
+            model.StocksPercentage = 70;
+            model.FundsPercentage = 30;
+            model.MinimalRiskPercentage = 0;
+        }
     }
 }
