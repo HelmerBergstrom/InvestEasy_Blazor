@@ -1,0 +1,113 @@
+@page "/RiskProfile"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize]
+
+@using InvestEasy.Models
+@using InvestEasy.Services
+
+@inject RiskProfileService RiskProfileService
+@inject CurrentUserService CurrentUserService
+
+
+<PageTitle> Risk Profile </PageTitle>
+
+<div class="page-header">
+    <h1 class="page-title"> Risk Profile </h1>
+    <p class="page-subtitle">
+        Answer a few questions to get a suggested portfolio allocation based on your goals and risk tolerance.
+    </p>
+</div>
+
+<div>
+
+    <RiskProfileQA Model="model" />
+
+    <div>
+        <button class="btn btn-primary" @onclick="CalculateProfile">
+            Calculate Risk Profile
+        </button>
+    </div>
+
+    @if (hasResult)
+    {
+        <section class="risk-result">
+
+            <h2> Your Suggested Risk Profile </h2>
+
+            <p><strong> Profile: </strong> @model.ProfileName</p>
+
+            <div>
+
+                <div>
+                    <strong> Stocks </strong>
+                    <p>@model.StocksPercentage%</p>
+                </div>
+
+                <div>
+                    <strong> Funds </strong>
+                    <p>@model.FundsPercentage%</p>
+                </div>
+
+                <div>
+                    <strong> Low risk / savings </strong>
+                    <p>@model.MinimalRiskPercentage%</p>
+                </div>
+
+            </div>
+
+            <div class="result-actions">
+                <button class="btn btn-success" @onclick="SaveRiskProfile">
+                    Save Risk Profile
+                </button>
+
+                <button class="btn btn-secondary" @onclick="ResetRiskProfile">
+                    Start Over
+                </button>
+            </div>
+
+        </section>
+    }
+
+</div>
+
+
+@code {
+
+    private RiskProfileModel model = new RiskProfileModel();
+    private bool hasResult = false;
+
+    // calculates riskprofile via CalculateProfile and user input.
+    private async Task CalculateProfile()
+    {
+        // gets userId
+        string? userId = await CurrentUserService.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+        model.UserId = userId;
+
+        RiskProfileService.CalculateProfile(model);
+
+        hasResult = true;
+    }
+
+    // Saves risk profile
+    private Task SaveRiskProfile()
+    {
+        return Task.CompletedTask;
+    }
+
+    // resets users answers.
+    private void ResetRiskProfile()
+    {
+        model = new RiskProfileModel();
+        hasResult = false;
+    }
+
+}

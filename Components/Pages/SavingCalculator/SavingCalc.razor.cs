@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using InvestEasy.Models;
 using InvestEasy.Services;
 
-namespace InvestEasy.Components.Pages;
+namespace InvestEasy.Components.Pages.SavingCalculator;
 
 public partial class SavingCalc
 {

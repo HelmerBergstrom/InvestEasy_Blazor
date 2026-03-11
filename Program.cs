@@ -31,6 +31,8 @@ builder.Services.AddScoped<UserProgressService>();
 
 builder.Services.AddScoped<CurrentUserService>();
 
+builder.Services.AddScoped<RiskProfileService>();
+
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
