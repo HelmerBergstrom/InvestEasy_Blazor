@@ -1,1 +1,97 @@
 @page "/education/level2"
+@rendermode InteractiveServer
+@using InvestEasy.Services
+@inject UserProgressService UserProgressService
+@inject CurrentUserService CurrentUserService
+@inject NavigationManager Navigation
+
+<PageTitle> Level 2 </PageTitle>
+
+<div class="level-page">
+    <div class="page-header">
+        <p class="page-subtitle">
+            Level 2
+        </p>
+        <h1 class="page-title"> Move Forward </h1>
+    </div>
+
+    <div class="level-content">
+
+        <Level2Content />
+
+        <h2> Knowledge Check </h2>
+
+        <section class="lesson-card">
+            <h3>Questions and Answers</h3>
+
+            <p>
+                Expand each question to review the most important concepts from this level.
+            </p>
+
+            <div class="qa-list">
+
+                <details class="qa-item">
+                    <summary>What does investment risk mean?</summary>
+                    <p>
+                        Investment risk refers to the possibility that an investment may lose value
+                        or perform worse than expected.
+                    </p>
+                </details>
+
+                <details class="qa-item">
+                    <summary>Why are higher potential returns usually linked to higher risk?</summary>
+                    <p>
+                        Investments that can grow faster often involve greater uncertainty and
+                        volatility, which increases the chance of both gains and losses.
+                    </p>
+                </details>
+
+                <details class="qa-item">
+                    <summary>What is a portfolio?</summary>
+                    <p>
+                        A portfolio is the collection of all investments that an investor owns.
+                    </p>
+                </details>
+
+                <details class="qa-item">
+                    <summary>What is diversification?</summary>
+                    <p>
+                        Diversification means spreading investments across multiple assets in
+                        order to reduce the impact of any single investment performing poorly.
+                    </p>
+                </details>
+
+                <details class="qa-item">
+                    <summary>Why do many investors focus on long‑term strategies?</summary>
+                    <p>
+                        Long‑term strategies help investors avoid reacting emotionally to short‑term
+                        market movements and allow investments more time to grow.
+                    </p>
+                </details>
+
+            </div>
+
+        </section>
+
+        <div class="complete-task-btn">
+            <button class="btn btn-success" type="button" @onclick="CompleteLevel2Async">Complete Level 2</button>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    // sets level 1 to completed for user.
+    private async Task CompleteLevel2Async()
+    {
+        string? userId = await CurrentUserService.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+        await UserProgressService.CompleteLevelAsync(userId, levelNumber: 2);
+        Navigation.NavigateTo(uri: "/education");
+    }
+}

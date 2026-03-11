@@ -1,1 +1,115 @@
 @page "/education/level3"
+@rendermode InteractiveServer
+@using InvestEasy.Services
+@inject UserProgressService UserProgressService
+@inject CurrentUserService CurrentUserService
+@inject NavigationManager Navigation
+
+<PageTitle> Level 3 </PageTitle>
+
+<div class="level-page">
+    <div class="page-header">
+        <p class="page-subtitle">
+            Level 3
+        </p>
+        <h1 class="page-title"> Knowledge </h1>
+    </div>
+
+    <div class="level-content">
+
+        <Level3Content />
+
+        <h2> Knowledge Check </h2>
+
+        <section class="lesson-card">
+            <h3>Questions and Answers</h3>
+
+            <p>
+                Expand each question to review the most important concepts from this level.
+            </p>
+
+            <div class="qa-list">
+
+                <details class="qa-item">
+                    <summary>What is asset allocation?</summary>
+                    <p>
+                        Asset allocation is the way an investor distributes their money across different
+                        types of investments such as stocks, funds, or bonds in order to balance risk
+                        and potential return.
+                    </p>
+                </details>
+
+                <details class="qa-item">
+                    <summary>Why is asset allocation important?</summary>
+                    <p>
+                        Asset allocation helps manage risk because different types of investments
+                        often perform differently during various market conditions.
+                    </p>
+                </details>
+
+                <details class="qa-item">
+                    <summary>What does portfolio rebalancing mean?</summary>
+                    <p>
+                        Portfolio rebalancing means adjusting your investments over time to restore
+                        your intended asset allocation when some investments grow faster than others.
+                    </p>
+                </details>
+
+                <details class="qa-item">
+                    <summary>Why do investors rebalance their portfolios?</summary>
+                    <p>
+                        Investors rebalance to maintain their desired risk level and prevent their
+                        portfolio from becoming too concentrated in a single investment or sector.
+                    </p>
+                </details>
+
+                <details class="qa-item">
+                    <summary>What is a common emotional mistake investors make during market downturns?</summary>
+                    <p>
+                        A common mistake is panic selling, where investors sell their investments
+                        during market declines instead of staying focused on long-term strategies.
+                    </p>
+                </details>
+
+                <details class="qa-item">
+                    <summary>What does "chasing performance" mean?</summary>
+                    <p>
+                        Chasing performance means buying investments simply because they have
+                        recently increased in price, assuming they will continue rising.
+                    </p>
+                </details>
+
+                <details class="qa-item">
+                    <summary>Why is long-term thinking important in investing?</summary>
+                    <p>
+                        Long-term thinking helps investors avoid emotional decisions caused by
+                        short-term market movements and gives investments time to grow.
+                    </p>
+                </details>
+
+            </div>
+
+        </section>
+
+        <div class="complete-task-btn">
+            <button class="btn btn-success" type="button" @onclick="CompleteLevel3Async">Complete Level 3</button>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    // sets level 1 to completed for user.
+    private async Task CompleteLevel3Async()
+    {
+        string? userId = await CurrentUserService.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+        await UserProgressService.CompleteLevelAsync(userId, levelNumber: 3);
+        Navigation.NavigateTo(uri: "/education");
+    }
+}

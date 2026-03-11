@@ -35,12 +35,13 @@ p {
     text-align: center;
 }
 
-/* Styles for Level1.razor Level2.razor & Level3.razor*/
+/* Styles for Level1.razor, Level2.razor & Level3.razor  */
 
 .level-page {
     max-width: 1000px;
     margin: 1.75rem auto 2.5rem auto;
     padding: 0 1.25rem;
+    color: white;
 }
 
 .level-content {
@@ -78,6 +79,53 @@ p {
     line-height: 1.6;
 }
 
+.complete-task-btn .btn-success {
+    width: 100%;
+    padding: 1rem 0;
+    margin-top: 20px;
+}
+
+.qa-list {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.qa-item {
+    border: 3px solid #253358;
+    border-radius: 10px;
+    background: #111c37;
+    overflow: hidden;
+}
+
+.qa-item summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.9rem 1rem;
+    list-style: none;
+    position: relative;
+}
+
+.qa-item summary::after {
+    content: "▸";
+    position: absolute;
+    right: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.qa-item[open] summary::after {
+    transform: rotate(90deg);
+}
+
+.qa-item p {
+    padding: 0.75rem 1rem 1rem 1rem;
+    margin: 0;
+    line-height: 1.6;
+    color: white;
+    border: 1px solid #253358;
+}
+
 @media (max-width: 1100px) {
     .level-page {
         padding: 0 1rem;
@@ -85,9 +133,5 @@ p {
 
     .lesson-card {
         padding: 1rem;
-    }
-
-    .complete-button {
-        width: 100%;
     }
 }

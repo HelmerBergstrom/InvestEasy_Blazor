@@ -1,4 +1,9 @@
 @page "/education/level1"
+@rendermode InteractiveServer
+@using InvestEasy.Services
+@inject UserProgressService UserProgressService
+@inject CurrentUserService CurrentUserService
+@inject NavigationManager Navigation
 
 <PageTitle> Level 1 </PageTitle>
 
@@ -17,11 +22,64 @@
         <h2> Knowledge Check </h2>
 
         <section class="lesson-card">
-            <h3> Quiz </h3>
+            <h3> Questions and Answers </h3>
+            <p>
+                Review the most important concepts from this level by expanding each question to reveal the answer.
+            </p>
+
+            <div class="qa-list">
+                <details class="qa-item">
+                    <summary> What does a stock represent? </summary>
+                    <p><strong>Answer: </strong> A stock represents a small ownership share in a company. </p>
+                </details>
+
+                <details class="qa-item">
+                    <summary> What is the main difference between a stock and a fund? </summary>
+                    <p><strong>Answer: </strong> A stock gives you ownership in one company, while a fund spreads your
+                        money across many
+                        investments.</p>
+                </details>
+
+                <details class="qa-item">
+                    <summary> Why do stock prices change? </summary>
+                    <p><strong>Answer: </strong> Stock prices change because of supply and demand, company performance,
+                        and investor expectations.
+                    </p>
+                </details>
+
+                <details class="qa-item">
+                    <summary> Why are funds often considered less risky than individual stocks? </summary>
+                    <p><strong>Answer: </strong> Funds are usually more diversified, which reduces the impact of one
+                        company performing badly.</p>
+                </details>
+
+                <details class="qa-item">
+                    <summary> What usually happens if you sell a stock for more than you paid? </summary>
+                    <p><strong>Answer: </strong> You make a profit because you sold the stock at a higher price than
+                        your purchase price.</p>
+                </details>
+            </div>
         </section>
 
         <div class="complete-task-btn">
-            <button class="btn btn-success" type="button"> Complete Level 1 </button>
+            <button class="btn btn-success" type="button" @onclick="CompleteLevel1Async">Complete Level 1</button>
         </div>
     </div>
 </div>
+
+
+@code {
+    // sets level 1 to completed for user.
+    private async Task CompleteLevel1Async()
+    {
+        string? userId = await CurrentUserService.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+        await UserProgressService.CompleteLevelAsync(userId, levelNumber: 1);
+        Navigation.NavigateTo(uri: "/education");
+    }
+}
