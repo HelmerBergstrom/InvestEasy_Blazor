@@ -21,57 +21,54 @@
     </p>
 </div>
 
-<div>
+<RiskProfileQA Model="model" />
 
-    <RiskProfileQA Model="model" />
-
-    <div>
-        <button class="btn btn-primary" @onclick="CalculateProfile">
-            Calculate Risk Profile
-        </button>
-    </div>
-
-    @if (hasResult)
-    {
-        <section class="risk-result">
-
-            <h2> Your Suggested Risk Profile </h2>
-
-            <p><strong> Profile: </strong> @model.ProfileName</p>
-
-            <div>
-
-                <div>
-                    <strong> Stocks </strong>
-                    <p>@model.StocksPercentage%</p>
-                </div>
-
-                <div>
-                    <strong> Funds </strong>
-                    <p>@model.FundsPercentage%</p>
-                </div>
-
-                <div>
-                    <strong> Low risk / savings </strong>
-                    <p>@model.MinimalRiskPercentage%</p>
-                </div>
-
-            </div>
-
-            <div class="result-actions">
-                <button class="btn btn-success" @onclick="SaveRiskProfile">
-                    Save Risk Profile
-                </button>
-
-                <button class="btn btn-secondary" @onclick="ResetRiskProfile">
-                    Start Over
-                </button>
-            </div>
-
-        </section>
-    }
-
+<div class="calculate-btn">
+    <button class="btn btn-primary" @onclick="CalculateProfile">
+        Calculate Risk Profile
+    </button>
 </div>
+
+@if (hasResult)
+{
+    <section class="risk-result">
+
+        <h2> Your Suggested Risk Profile </h2>
+
+        <div class="calculated-results">
+
+            <p style="text-decoration: underline; text-transform: uppercase;">@model.ProfileName</p>
+
+
+            <div class="result-div">
+                <strong> Stocks </strong>
+                <p>@model.StocksPercentage%</p>
+            </div>
+
+            <div class="result-div">
+                <strong> Funds </strong>
+                <p>@model.FundsPercentage%</p>
+            </div>
+
+            <div class="result-div">
+                <strong> Low risk / savings </strong>
+                <p>@model.MinimalRiskPercentage%</p>
+            </div>
+
+        </div>
+
+        <div class="result-actions">
+            <button class="btn btn-success" @onclick="SaveRiskProfile">
+                Save Risk Profile
+            </button>
+
+            <button class="btn btn-secondary" @onclick="ResetRiskProfile">
+                Start Over
+            </button>
+        </div>
+
+    </section>
+}
 
 
 @code {
