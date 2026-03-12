@@ -9,7 +9,5 @@
     border: 5px solid #ffffff;
     width: 400px;
     height: auto;
-    border-radius: 50%;
-    transition: opacity 0.2s ease;
-    opacity: 0.9;
+    border-radius: 100%;
 }

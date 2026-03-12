@@ -9,10 +9,6 @@
 @using InvestEasy.Services
 @using Microsoft.EntityFrameworkCore
 
-@inject ApplicationDbContext DbContext
-@inject RiskProfileService RiskProfileService
-@inject CurrentUserService CurrentUserService
-
 
 <PageTitle> Risk Profile </PageTitle>
 
@@ -20,6 +16,16 @@
     <h1 class="page-title"> Risk Profile </h1>
     <p class="page-subtitle">
         Answer a few questions to get a suggested portfolio allocation based on your goals and risk tolerance.
+    </p>
+</div>
+
+<div class="risk-disclaimer">
+    <p style="font-size: 1.4rem; margin-bottom: 1px;"><strong> Disclaimer </strong></p>
+    <p>
+        Investing always involves risk. Historical returns do not guarantee future results.
+        The suggested allocation is only a general guideline based on your answers and should
+        not be considered financial advice. Diversification across different asset classes
+        can help manage risk, but it cannot eliminate the possibility of losses.
     </p>
 </div>
 
@@ -39,7 +45,7 @@
 
         <div class="calculated-results">
 
-            <p style="text-decoration: underline; text-transform: uppercase;">@model.ProfileName</p>
+            <p><strong> Profile: </strong> @model.ProfileName </p>
 
 
             <div class="result-div">
@@ -65,111 +71,43 @@
             </button>
 
             <button class="btn btn-secondary" @onclick="ResetRiskProfile">
-                Start Over
+                Reset Answers
             </button>
         </div>
 
     </section>
 }
 
+@if (!string.IsNullOrWhiteSpace(saveMessage))
+{
+    <p class="save-message"> @saveMessage </p>
+}
 
-@code {
+@if (savedProfile is not null)
+{
+    <section class="risk-result">
+        <h2> Your Current Risk Profile </h2>
 
-    // values to -1 to force user to answer questions before calculation.
-    private RiskProfileModel model = new RiskProfileModel
-    {
-        TimeHorizon = -1,
-        MarketDropReaction = -1,
-        InvestmentGoal = -1,
-        ExperienceLevel = -1
-    };
-    private bool hasResult = false;
+        <div class="calculated-results">
 
-    // boolean for control if question values are 0 or more.
-    private bool CanCalculate =>
-    model.TimeHorizon >= 0 &&
-    model.MarketDropReaction >= 0 &&
-    model.InvestmentGoal >= 0 &&
-    model.ExperienceLevel >= 0;
+            <p><strong> Profile: </strong> @savedProfile.ProfileName </p>
 
-    // calculates riskprofile via CalculateProfile and user input.
-    private async Task CalculateProfile()
-    {
-        // gets userId
-        string? userId = await CurrentUserService.GetUserIdAsync();
 
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return;
-        }
+            <div class="result-div">
+                <strong> Stocks </strong>
+                <p> @savedProfile.StocksPercentage% </p>
+            </div>
 
-        if (!CanCalculate)
-        {
-            return;
-        }
+            <div class="result-div">
+                <strong> Funds </strong>
+                <p> @savedProfile.FundsPercentage% </p>
+            </div>
 
-        model.UserId = userId;
-
-        RiskProfileService.CalculateProfile(model);
-
-        hasResult = true;
-    }
-
-    // Saves risk profile
-    private async Task SaveRiskProfile()
-    {
-        string? userId = await CurrentUserService.GetUserIdAsync();
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return;
-        }
-
-        model.UserId = userId;
-
-        // gets existing profile if it exists from db.
-        RiskProfileModel? existingProfile = await DbContext.RiskProfiles
-        .FirstOrDefaultAsync(x => x.UserId == userId);
-
-        // creates profile if user doesn´t have one, overrides current risk profile
-        // if profile exists for user.
-        if (existingProfile is null)
-        {
-            model.CreatedUtc = DateTime.Now;
-            DbContext.RiskProfiles.Add(model);
-        }
-        else
-        {
-            existingProfile.TimeHorizon = model.TimeHorizon;
-            existingProfile.MarketDropReaction = model.MarketDropReaction;
-            existingProfile.ExperienceLevel = model.ExperienceLevel;
-            existingProfile.InvestmentGoal = model.InvestmentGoal;
-
-            existingProfile.TotalScore = model.TotalScore;
-            existingProfile.ProfileName = model.ProfileName;
-
-            existingProfile.StocksPercentage = model.StocksPercentage;
-            existingProfile.FundsPercentage = model.FundsPercentage;
-            existingProfile.MinimalRiskPercentage = model.MinimalRiskPercentage;
-
-            existingProfile.CreatedUtc = model.CreatedUtc;
-        }
-
-        await DbContext.SaveChangesAsync();
-    }
-
-    // resets users answers.
-    private void ResetRiskProfile()
-    {
-        model = new RiskProfileModel
-        {
-            TimeHorizon = -1,
-            MarketDropReaction = -1,
-            InvestmentGoal = -1,
-            ExperienceLevel = -1
-        };
-
-        hasResult = false;
-    }
-
+            <div class="result-div">
+                <strong> Low risk / savings </strong>
+                <p> @savedProfile.MinimalRiskPercentage% </p>
+            </div>
+        </div>
+    </section>
+    <br />
 }
