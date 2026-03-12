@@ -21,10 +21,10 @@
     </p>
 </div>
 
-<RiskProfileQA Model="model" />
+<RiskProfileQA Model="model" OnAnswerChanged="StateHasChanged" @key="model" />
 
 <div class="calculate-btn">
-    <button class="btn btn-primary" @onclick="CalculateProfile">
+    <button class="btn btn-primary" @onclick="CalculateProfile" disabled="@(!CanCalculate)">
         Calculate Risk Profile
     </button>
 </div>
@@ -73,8 +73,21 @@
 
 @code {
 
-    private RiskProfileModel model = new RiskProfileModel();
+    private RiskProfileModel model = new RiskProfileModel
+    {
+        TimeHorizon = -1,
+        MarketDropReaction = -1,
+        InvestmentGoal = -1,
+        ExperienceLevel = -1
+    };
     private bool hasResult = false;
+
+    // boolean for control if question values are 0 or more.
+    private bool CanCalculate =>
+    model.TimeHorizon >= 0 &&
+    model.MarketDropReaction >= 0 &&
+    model.InvestmentGoal >= 0 &&
+    model.ExperienceLevel >= 0;
 
     // calculates riskprofile via CalculateProfile and user input.
     private async Task CalculateProfile()
@@ -83,6 +96,11 @@
         string? userId = await CurrentUserService.GetUserIdAsync();
 
         if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+        if (!CanCalculate)
         {
             return;
         }
@@ -103,7 +121,14 @@
     // resets users answers.
     private void ResetRiskProfile()
     {
-        model = new RiskProfileModel();
+        model = new RiskProfileModel
+        {
+            TimeHorizon = -1,
+            MarketDropReaction = -1,
+            InvestmentGoal = -1,
+            ExperienceLevel = -1
+        };
+
         hasResult = false;
     }
 

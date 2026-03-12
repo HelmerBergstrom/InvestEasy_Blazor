@@ -6,22 +6,22 @@
         <h3> When do you expect to use this money? </h3>
 
         <label>
-            <input type="radio" name="time" @onclick="() => Model.TimeHorizon = 0">
+            <input type="radio" name="time" @onclick="() => SetTimeHorizon(0)">
             Within 1 year
         </label>
 
         <label>
-            <input type="radio" name="time" @onclick="() => Model.TimeHorizon = 1">
+            <input type="radio" name="time" @onclick="() => SetTimeHorizon(1)">
             1–3 years
         </label>
 
         <label>
-            <input type="radio" name="time" @onclick="() => Model.TimeHorizon = 2">
+            <input type="radio" name="time" @onclick="() => SetTimeHorizon(2)">
             3–7 years
         </label>
 
         <label>
-            <input type="radio" name="time" @onclick="() => Model.TimeHorizon = 3">
+            <input type="radio" name="time" @onclick="() => SetTimeHorizon(3)">
             More than 7 years
         </label>
     </section>
@@ -32,22 +32,22 @@
         <h3>If your investments dropped 20%, what would you do?</h3>
 
         <label>
-            <input type="radio" name="drop" @onclick="() => Model.MarketDropReaction = 0">
+            <input type="radio" name="drop" @onclick="() => SetMarketDropReaction(0)">
             Sell everything
         </label>
 
         <label>
-            <input type="radio" name="drop" @onclick="() => Model.MarketDropReaction = 1">
+            <input type="radio" name="drop" @onclick="() => SetMarketDropReaction(1)">
             Sell part of it
         </label>
 
         <label>
-            <input type="radio" name="drop" @onclick="() => Model.MarketDropReaction = 2">
+            <input type="radio" name="drop" @onclick="() => SetMarketDropReaction(2)">
             Do nothing
         </label>
 
         <label>
-            <input type="radio" name="drop" @onclick="() => Model.MarketDropReaction = 3">
+            <input type="radio" name="drop" @onclick="() => SetMarketDropReaction(3)">
             Invest more
         </label>
     </section>
@@ -58,22 +58,22 @@
         <h3>What is your main investment goal?</h3>
 
         <label>
-            <input type="radio" name="goal" @onclick="() => Model.InvestmentGoal = 0">
+            <input type="radio" name="goal" @onclick="() => SetInvestmentGoal(0)">
             Protect my money
         </label>
 
         <label>
-            <input type="radio" name="goal" @onclick="() => Model.InvestmentGoal = 1">
+            <input type="radio" name="goal" @onclick="() => SetInvestmentGoal(1)">
             Grow steadily
         </label>
 
         <label>
-            <input type="radio" name="goal" @onclick="() => Model.InvestmentGoal = 2">
+            <input type="radio" name="goal" @onclick="() => SetInvestmentGoal(2)">
             Balanced growth
         </label>
 
         <label>
-            <input type="radio" name="goal" @onclick="() => Model.InvestmentGoal = 3">
+            <input type="radio" name="goal" @onclick="() => SetInvestmentGoal(3)">
             Maximize growth
         </label>
     </section>
@@ -84,22 +84,22 @@
         <h3>How experienced are you with investing?</h3>
 
         <label>
-            <input type="radio" name="exp" @onclick="() => Model.ExperienceLevel = 0">
+            <input type="radio" name="exp" @onclick="() => SetExperienceLevel(0)">
             No experience
         </label>
 
         <label>
-            <input type="radio" name="exp" @onclick="() => Model.ExperienceLevel = 1">
+            <input type="radio" name="exp" @onclick="() => SetExperienceLevel(1)">
             Some experience
         </label>
 
         <label>
-            <input type="radio" name="exp" @onclick="() => Model.ExperienceLevel = 2">
+            <input type="radio" name="exp" @onclick="() => SetExperienceLevel(2)">
             Comfortable investor
         </label>
 
         <label>
-            <input type="radio" name="exp" @onclick="() => Model.ExperienceLevel = 3">
+            <input type="radio" name="exp" @onclick="() => SetExperienceLevel(3)">
             Experienced investor
         </label>
     </section>
@@ -109,4 +109,31 @@
 @code {
     [Parameter]
     public RiskProfileModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnAnswerChanged { get; set; }
+
+    private async Task SetTimeHorizon(int value)
+    {
+        Model.TimeHorizon = value;
+        await OnAnswerChanged.InvokeAsync();
+    }
+
+    private async Task SetMarketDropReaction(int value)
+    {
+        Model.MarketDropReaction = value;
+        await OnAnswerChanged.InvokeAsync();
+    }
+
+    private async Task SetInvestmentGoal(int value)
+    {
+        Model.InvestmentGoal = value;
+        await OnAnswerChanged.InvokeAsync();
+    }
+
+    private async Task SetExperienceLevel(int value)
+    {
+        Model.ExperienceLevel = value;
+        await OnAnswerChanged.InvokeAsync();
+    }
 }
