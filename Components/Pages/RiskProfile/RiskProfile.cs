@@ -116,8 +116,9 @@ public partial class RiskProfile : ComponentBase
         }
         await DbContext.SaveChangesAsync();
 
-        saveMessage = "Risk profile saved.";
         await LoadSavedRiskProfile();
+        ResetRiskProfile();
+        saveMessage = "Risk profile saved.";
     }
 
     // resets users answers.

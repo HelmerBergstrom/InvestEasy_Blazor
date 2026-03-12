@@ -1,8 +1,15 @@
+.home-first {
+    background-color: #334561;
+    border-bottom: 2px solid #0f172a7c;
+    box-shadow: 10px 10px 10px #0f172a;
+    min-height: 100vh;
+    padding: 5rem 0 0 0;
+}
+
 .home-logo {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 70px;
 }
 
 .logo {
@@ -10,4 +17,72 @@
     width: 400px;
     height: auto;
     border-radius: 100%;
+}
+
+.platform-section {
+    max-width: 1100px;
+    min-height: 50vh;
+    margin: 80px auto 50px auto;
+    padding: 0 20px;
+}
+
+.platform-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.platform-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.platform-header p {
+    max-width: 650px;
+    margin: 0 auto;
+    color: white;
+}
+
+.platform-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.platform-card {
+    display: block;
+    text-decoration: none;
+    background: #0f172a;
+    border: 1px solid #0f172a;
+    border-radius: 14px;
+    padding: 22px;
+    transition: border 0.2s ease;
+}
+
+.platform-card h3 {
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+.platform-card p {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.785);
+}
+
+.platform-card:hover {
+    border: 1px solid #3b82f6;
+}
+
+@media (max-width: 1100px) {
+
+    .platform-header h2 {
+        font-size: 1.6rem;
+    }
+
+    .platform-card {
+        padding: 18px;
+    }
+
 }

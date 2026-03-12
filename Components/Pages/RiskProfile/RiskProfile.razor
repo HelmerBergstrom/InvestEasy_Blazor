@@ -19,29 +19,24 @@
     </p>
 </div>
 
-<div class="risk-disclaimer">
-    <p style="font-size: 1.4rem; margin-bottom: 1px;"><strong> Disclaimer </strong></p>
-    <p>
-        Investing always involves risk. Historical returns do not guarantee future results.
-        The suggested allocation is only a general guideline based on your answers and should
-        not be considered financial advice. Diversification across different asset classes
-        can help manage risk, but it cannot eliminate the possibility of losses.
-    </p>
-</div>
+@if (!hasResult)
+{
 
-<RiskProfileQA Model="model" OnAnswerChanged="StateHasChanged" @key="model" />
+    <RiskProfileQA Model="model" OnAnswerChanged="StateHasChanged" @key="model" />
 
-<div class="calculate-btn">
-    <button class="btn btn-primary" @onclick="CalculateProfile" disabled="@(!CanCalculate)">
-        Calculate Risk Profile
-    </button>
-</div>
+    <div class="calculate-btn">
+        <button class="btn btn-primary" @onclick="CalculateProfile" disabled="@(!CanCalculate)">
+            Calculate Risk Profile
+        </button>
+    </div>
+}
+
 
 @if (hasResult)
 {
     <section class="risk-result">
 
-        <h2> Your Suggested Risk Profile </h2>
+        <h2> Suggested Risk Profile </h2>
 
         <div class="calculated-results">
 
@@ -67,11 +62,11 @@
 
         <div class="result-actions">
             <button class="btn btn-success" @onclick="SaveRiskProfile">
-                Save Risk Profile
+                Save
             </button>
 
             <button class="btn btn-secondary" @onclick="ResetRiskProfile">
-                Reset Answers
+                Try Again
             </button>
         </div>
 
