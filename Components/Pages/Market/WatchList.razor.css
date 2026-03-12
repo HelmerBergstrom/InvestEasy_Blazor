@@ -138,21 +138,62 @@
 }
 
 @media (max-width: 1100px) {
+    .btn-secondary {
+        padding: 0rem 0rem;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 400px) {
     .watchlist {
-        padding: 0 1rem;
+        padding: 0 0.75rem;
+    }
+
+    .watchlist h2 {
+        font-size: 1.35rem;
+        margin: 1.5rem 0 0.5rem 0;
     }
 
     .index-card {
-        padding: 1rem;
+        align-items: flex-start;
+        gap: 0.85rem;
+        padding: 0.9rem 1rem;
     }
 
-    .index-card>p {
-        flex-basis: 100%;
+    .index-card-text {
         min-width: 0;
+        flex: 1 1 auto;
     }
 
-    .index-card .btn {
-        width: 100%;
-        margin-left: 0;
+    .index-card-text strong {
+        display: block;
+        font-size: 0.95rem;
+        line-height: 1.3;
+        margin-bottom: 0.2rem;
+    }
+
+    .index-card-text p {
+        font-size: 0.8rem;
+        line-height: 1.35;
+    }
+
+    .index-card .index-card-values {
+        min-width: 72px;
+        align-items: flex-end;
+        font-size: 0.85rem;
+        gap: 0;
+    }
+
+    .index-card-values strong {
+        font-size: 1rem;
+        line-height: 1.2;
+    }
+
+    .index-card .btn-secondary {
+        margin-left: 0.25rem;
+        padding: 0;
+        font-size: 12px;
+        line-height: 1;
+        min-width: auto;
     }
 }

@@ -32,3 +32,11 @@
 .nav-item ::deep .nav-link:hover {
     text-decoration: underline;
 }
+
+@media (max-width: 550px) {
+    .market-menu {
+        flex-direction: column;
+        text-align: center;
+        gap: 0px;
+    }
+}

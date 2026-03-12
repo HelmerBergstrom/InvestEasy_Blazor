@@ -2,7 +2,6 @@
     background-color: #334561;
     border-bottom: 2px solid #0f172a7c;
     box-shadow: 10px 10px 10px #0f172a;
-    min-height: 100vh;
     padding: 5rem 0 0 0;
 }
 
@@ -21,7 +20,6 @@
 
 .platform-section {
     max-width: 1100px;
-    min-height: 50vh;
     margin: 80px auto 50px auto;
     padding: 0 20px;
 }
@@ -83,6 +81,10 @@
 
     .platform-card {
         padding: 18px;
+    }
+
+    .logo {
+        width: 300px;
     }
 
 }

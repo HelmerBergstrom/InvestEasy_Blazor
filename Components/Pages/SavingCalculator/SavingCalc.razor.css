@@ -1,7 +1,6 @@
 .saving-calc {
     max-width: 760px;
     margin: 0 auto 3.25rem auto;
-    padding: 0 1.25rem;
     border-radius: 18px;
     padding: 1.75rem;
     background: linear-gradient(180deg,
@@ -76,10 +75,6 @@
 
 .btn.btn-success:hover {
     background: rgba(1, 169, 15, 0.1);
-}
-
-.btn+.btn {
-    margin-left: 0.75rem;
 }
 
 .summary {
@@ -179,7 +174,7 @@
     }
 
     .btn+.btn {
-        margin-left: 0;
+        margin-left: 0rem;
         margin-top: 0.6rem;
     }
 

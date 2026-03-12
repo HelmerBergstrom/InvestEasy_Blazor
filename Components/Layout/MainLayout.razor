@@ -1,11 +1,21 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="menu">
-        <NavMenu />
-    </div>
+<div class="layout-root">
 
-    <main class="main-content">
+    <NavMenu />
+
+    <main class="layout-main">
         @Body
     </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p><strong>© 2026 InvestEasy</strong></p>
+            <p>
+                This platform is intended for educational purposes only.
+                The information provided should not be considered financial advice.
+            </p>
+        </div>
+    </footer>
+
 </div>
