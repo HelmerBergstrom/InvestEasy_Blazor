@@ -4,10 +4,12 @@
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
 @attribute [Authorize]
-
+@using InvestEasy.Data
 @using InvestEasy.Models
 @using InvestEasy.Services
+@using Microsoft.EntityFrameworkCore
 
+@inject ApplicationDbContext DbContext
 @inject RiskProfileService RiskProfileService
 @inject CurrentUserService CurrentUserService
 
@@ -73,6 +75,7 @@
 
 @code {
 
+    // values to -1 to force user to answer questions before calculation.
     private RiskProfileModel model = new RiskProfileModel
     {
         TimeHorizon = -1,
@@ -113,9 +116,46 @@
     }
 
     // Saves risk profile
-    private Task SaveRiskProfile()
+    private async Task SaveRiskProfile()
     {
-        return Task.CompletedTask;
+        string? userId = await CurrentUserService.GetUserIdAsync();
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+        model.UserId = userId;
+
+        // gets existing profile if it exists from db.
+        RiskProfileModel? existingProfile = await DbContext.RiskProfiles
+        .FirstOrDefaultAsync(x => x.UserId == userId);
+
+        // creates profile if user doesn´t have one, overrides current risk profile
+        // if profile exists for user.
+        if (existingProfile is null)
+        {
+            model.CreatedUtc = DateTime.Now;
+            DbContext.RiskProfiles.Add(model);
+        }
+        else
+        {
+            existingProfile.TimeHorizon = model.TimeHorizon;
+            existingProfile.MarketDropReaction = model.MarketDropReaction;
+            existingProfile.ExperienceLevel = model.ExperienceLevel;
+            existingProfile.InvestmentGoal = model.InvestmentGoal;
+
+            existingProfile.TotalScore = model.TotalScore;
+            existingProfile.ProfileName = model.ProfileName;
+
+            existingProfile.StocksPercentage = model.StocksPercentage;
+            existingProfile.FundsPercentage = model.FundsPercentage;
+            existingProfile.MinimalRiskPercentage = model.MinimalRiskPercentage;
+
+            existingProfile.CreatedUtc = model.CreatedUtc;
+        }
+
+        await DbContext.SaveChangesAsync();
     }
 
     // resets users answers.
