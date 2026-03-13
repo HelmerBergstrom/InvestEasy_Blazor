@@ -59,7 +59,7 @@
 
         <div class="input-group">
             <label for="monthly"> Monthly savings </label>
-            <RangeInput TValue="int" @bind-Value="model.MonthlyAmount" Min="0" Max="15000" Step="500" />
+            <RangeInput id="monthly" TValue="int" @bind-Value="model.MonthlyAmount" Min="0" Max="15000" Step="500" />
             <Badge Color="BadgeColor.Primary" visuallyHiddenText="model.MonthlyAmount">
                 @model.MonthlyAmount</Badge>
         </div>
