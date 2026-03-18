@@ -138,7 +138,7 @@
 <div class="saving-calc">
     @if (savedScenarios.Any() && editingScenarioId is null)
     {
-        <h3> Saved scenarios </h3>
+        <h2 style="text-align: center;"> Saved scenarios </h2>
 
         @foreach (SavingScenarioModel s in savedScenarios)
         {
@@ -150,7 +150,7 @@
 
             <br />
 
-            <h4><strong> @s.Name - @s.CreatedDate </strong></h4>
+            <h3 style="text-align: left;"><strong> @s.Name - @s.CreatedDate </strong></h3>
             <p><strong> Monthly saving:</strong> @s.MonthlyAmount.ToString(format: "N0") </p>
             <p><strong> Initial amount:</strong> @s.InitialAmount.ToString(format: "N0") </p>
             <p><strong> Time horizon:</strong> @s.SavingHorizon years </p>
