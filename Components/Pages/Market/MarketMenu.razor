@@ -1,43 +1,46 @@
-<div class="page-header">
-    <h1 class="page-title"> Market </h1>
-    <p class="page-subtitle">
-        Stay informed with the latest market news, track major indexes, and explore individual stocks.
-    </p>
-</div>
+@* Shared header and section tabs for all market pages. *@
+<PageHeader Title="@Title" Icon="@Icon" Eyebrow="Market">
+    @Description
+</PageHeader>
 
-<div class="market-menu-container">
-    <p> What would you like to explore? </p>
-    <div class="market-menu">
-        <div class="nav-item">
-            <NavLink href="/market/news" class="nav-link" Match="NavLinkMatch.All" ActiveClass="active">
-                News
+<nav class="market-tabs-wrapper" aria-label="Market sections">
+    <ul class="market-tabs">
+        <li>
+            <NavLink href="/market/news" class="market-tab" ActiveClass="active">
+                <i class="bi bi-newspaper" aria-hidden="true"></i> News
             </NavLink>
-        </div>
-        <div class="nav-item">
-            <NavLink href="/market/indexes" class="nav-link" ActiveClass="active">
-                Indexes
+        </li>
+        <li>
+            <NavLink href="/market/indexes" class="market-tab" ActiveClass="active">
+                <i class="bi bi-bar-chart-line" aria-hidden="true"></i> Indexes
             </NavLink>
-        </div>
-        <div class="nav-item">
-            <NavLink href="/market/stocks" class="nav-link" ActiveClass="active">
-                Popular stocks
+        </li>
+        <li>
+            <NavLink href="/market/stocks" class="market-tab" ActiveClass="active">
+                <i class="bi bi-building" aria-hidden="true"></i> Popular stocks
             </NavLink>
-        </div>
-        <AuthorizeView>
-            <Authorized>
-                <div class="nav-item">
-                    <NavLink href="/market/watchlist" class="nav-link" ActiveClass="active">
-                        My watchlist
+        </li>
+        <li>
+            <AuthorizeView>
+                <Authorized>
+                    <NavLink href="/market/watchlist" class="market-tab" ActiveClass="active">
+                        <i class="bi bi-eye" aria-hidden="true"></i> My watchlist
                     </NavLink>
-                </div>
-            </Authorized>
-            <NotAuthorized>
-                <div class="nav-item">
-                    <NavLink href="Account/Login" class="nav-link">
-                        My watchlist 🔒
+                </Authorized>
+                <NotAuthorized>
+                    <NavLink href="Account/Login" class="market-tab">
+                        <i class="bi bi-lock" aria-hidden="true"></i> My watchlist
+                        <span class="visually-hidden">(requires login)</span>
                     </NavLink>
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
-    </div>
-</div>
+                </NotAuthorized>
+            </AuthorizeView>
+        </li>
+    </ul>
+</nav>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Market";
+    [Parameter] public string Icon { get; set; } = "bi-graph-up";
+    [Parameter] public string Description { get; set; } =
+        "Stay informed with the latest market news, track major indexes and explore individual stocks.";
+}

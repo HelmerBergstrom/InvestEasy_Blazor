@@ -95,7 +95,7 @@ public partial class RiskProfile : ComponentBase
         // if profile exists for user.
         if (existingProfile is null)
         {
-            model.CreatedUtc = DateTime.Now;
+            model.CreatedUtc = DateTime.UtcNow;
             DbContext.RiskProfiles.Add(model);
         }
         else
@@ -112,7 +112,7 @@ public partial class RiskProfile : ComponentBase
             existingProfile.FundsPercentage = model.FundsPercentage;
             existingProfile.MinimalRiskPercentage = model.MinimalRiskPercentage;
 
-            existingProfile.CreatedUtc = DateTime.Now;
+            existingProfile.CreatedUtc = DateTime.UtcNow;
         }
         await DbContext.SaveChangesAsync();
 

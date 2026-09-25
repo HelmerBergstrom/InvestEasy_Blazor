@@ -1,42 +1,52 @@
-.market-menu-container {
+.market-tabs-wrapper {
+    max-width: var(--content-width);
+    margin: 0 auto 2rem auto;
+    padding: 0 1.25rem;
+}
+
+.market-tabs {
     display: flex;
-    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0.35rem;
+    list-style: none;
+    overflow-x: auto;
+    border-radius: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.market-tabs li {
+    flex: 1;
+}
+
+.market-tabs ::deep .market-tab {
+    display: flex;
     align-items: center;
-    border-top: 1px solid #ffffff24;
-    border-bottom: 1px solid #ffffff24;
-}
-
-.market-menu-container p {
-    margin-top: 20px;
-    color: rgba(226, 232, 240, 0.78);
-}
-
-.market-menu {
-    display: flex;
-    flex-direction: row;
     justify-content: center;
-    gap: 50px;
-}
-
-.nav-item {
-    color: white;
+    gap: 0.45rem;
+    padding: 0.65rem 1rem;
+    border-radius: 10px;
+    color: var(--text-secondary);
     font-weight: 600;
-    font-size: 20px;
-    margin-bottom: 20px;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.nav-item ::deep a.active {
-    text-decoration: underline;
+.market-tabs ::deep .market-tab:hover {
+    background: rgba(148, 163, 184, 0.12);
+    color: white;
 }
 
-.nav-item ::deep .nav-link:hover {
-    text-decoration: underline;
+.market-tabs ::deep .market-tab.active {
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.4);
 }
 
-@media (max-width: 550px) {
-    .market-menu {
-        flex-direction: column;
-        text-align: center;
-        gap: 0px;
+@media (max-width: 700px) {
+    .market-tabs li {
+        flex: 0 0 auto;
     }
 }

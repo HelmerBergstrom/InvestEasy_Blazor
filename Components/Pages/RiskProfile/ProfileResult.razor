@@ -1,0 +1,58 @@
+@using InvestEasy.Models
+
+@* Shows a risk profile: name, short explanation, allocation chart and the three percentages. *@
+<section class="panel profile-result" aria-labelledby="@HeadingId">
+    <div class="profile-head">
+        <div>
+            <p class="profile-eyebrow"> @Heading </p>
+            <h2 id="@HeadingId" class="profile-name"> @Profile.ProfileName </h2>
+        </div>
+        @if (SavedDate is not null)
+        {
+            <span class="pill pill-muted">
+                <i class="bi bi-bookmark-check" aria-hidden="true"></i> Saved @SavedDate.Value.ToLocalTime().ToString("yyyy-MM-dd")
+            </span>
+        }
+    </div>
+
+    <p class="profile-description"> @Description </p>
+
+    <AllocationChart Profile="Profile" />
+
+    <div class="calculated-results">
+        <div class="result-div">
+            <strong><span class="swatch stocks"></span> Stocks </strong>
+            <p>@Profile.StocksPercentage%</p>
+        </div>
+        <div class="result-div">
+            <strong><span class="swatch funds"></span> Funds </strong>
+            <p>@Profile.FundsPercentage%</p>
+        </div>
+        <div class="result-div">
+            <strong><span class="swatch low-risk"></span> Low risk / savings </strong>
+            <p>@Profile.MinimalRiskPercentage%</p>
+        </div>
+    </div>
+
+    @ChildContent
+</section>
+
+@code {
+    [Parameter, EditorRequired] public RiskProfileModel Profile { get; set; } = default!;
+    [Parameter, EditorRequired] public string Heading { get; set; } = "";
+    [Parameter] public DateTime? SavedDate { get; set; }
+
+    // Buttons or other content shown under the result.
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string HeadingId => "profile-" + Heading.Replace(" ", "-").ToLowerInvariant();
+
+    private string Description => Profile.ProfileName switch
+    {
+        "Very Low Risk" => "Your answers point to keeping your money safe and available. Focus on savings accounts and other low-risk options.",
+        "Low Risk" => "A careful mix with a solid safety buffer. Funds give broad exposure while a part stays in low-risk savings.",
+        "Moderate Risk" => "A balanced approach for a longer horizon. Most is in diversified funds, with some individual stocks for extra growth.",
+        "High Risk" => "You have time and tolerance for ups and downs. A larger share in stocks gives higher potential returns, with bigger swings.",
+        _ => ""
+    };
+}

@@ -7,13 +7,12 @@
 
 <PageTitle> Level 1 </PageTitle>
 
-<div class="level-page">
-    <div class="page-header">
-        <p class="page-subtitle">
-            Level 1
-        </p>
-        <h1 class="page-title"> Investing Basics </h1>
-    </div>
+<PageHeader Title="Investing Basics" Eyebrow="Academy · Level 1" Icon="bi-journal-text"
+            BackHref="/education" BackText="Back to Academy" Width="narrow">
+    Read the lesson, check your knowledge with the questions and complete the level to unlock the next one.
+</PageHeader>
+
+<div class="page-container narrow">
 
     <div class="level-content">
 
@@ -62,7 +61,9 @@
         </section>
 
         <div class="complete-task-btn">
-            <button class="btn btn-success" type="button" @onclick="CompleteLevel1Async">Complete Level 1</button>
+            <button class="btn btn-primary-action" type="button" @onclick="CompleteLevel1Async">
+                <i class="bi bi-check2-circle" aria-hidden="true"></i> Complete level 1
+            </button>
         </div>
     </div>
 </div>

@@ -1,57 +1,89 @@
-﻿@page "/"
+@page "/"
 
 <PageTitle> InvestEasy </PageTitle>
 
-<div class="home-first">
-    <div class="home-logo">
-        <img src="images/investEasy.png" class="logo" alt="InvestEasy - Since 2026 (logo)">
-    </div>
+<section class="home-hero" aria-labelledby="home-title">
+    <div class="home-hero-inner">
+        <div class="home-hero-text">
+            <p class="page-eyebrow"> Learn · Track · Plan </p>
+            <h1 id="home-title" class="home-title">
+                Build your financial future, <span class="accent">one smart step at a time.</span>
+            </h1>
+            <p class="home-lead">
+                Learn how to invest, follow the markets and plan your savings with practical tools and
+                educational resources, all in one place.
+            </p>
 
-    <div class="page-header">
-        <h1 class="page-title"> InvestEasy </h1>
-        <p class="page-subtitle">
-            Learn how to invest, analyze markets, and build your own strategy with practical tools and educational
-            resources.
-        </p>
-    </div>
-    <div>
-        <p style="font-size: 3rem; text-align: center;"> ⬇️ </p>
-    </div>
-</div>
+            <div class="home-actions">
+                <AuthorizeView>
+                    <Authorized>
+                        <a class="btn btn-primary-action btn-lg" href="/savingcalc">
+                            <i class="bi bi-piggy-bank" aria-hidden="true"></i> Plan your savings
+                        </a>
+                        <a class="btn btn-outline btn-lg" href="/education">
+                            <i class="bi bi-mortarboard" aria-hidden="true"></i> Continue learning
+                        </a>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a class="btn btn-primary-action btn-lg" href="Account/Register">
+                            Create free account <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                        </a>
+                        <a class="btn btn-outline btn-lg" href="/market">
+                            <i class="bi bi-graph-up" aria-hidden="true"></i> Explore the market
+                        </a>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
 
-<section class="platform-section">
-    <div class="platform-header">
-        <h2>Explore the Platform</h2>
-        <p>
-            Access the main parts of InvestEasy and continue building your knowledge,
-            tracking markets, and using the practical tools available in the app.
-        </p>
-    </div>
+            <ul class="home-highlights">
+                <li><i class="bi bi-check2-circle" aria-hidden="true"></i> Live market data</li>
+                <li><i class="bi bi-check2-circle" aria-hidden="true"></i> Step-by-step academy</li>
+                <li><i class="bi bi-check2-circle" aria-hidden="true"></i> Personal tools</li>
+            </ul>
+        </div>
 
-    <div class="platform-grid">
-        <a class="platform-card" href="/market">
-            <h3> 📊 Markets </h3>
-            <p>Follow market news, major indexes, and stock data in one place.</p>
-        </a>
-
-        <a class="platform-card" href="/market/watchlist">
-            <h3> 👓 My Watchlist </h3>
-            <p>Track selected stocks and monitor how they move over time.</p>
-        </a>
-
-        <a class="platform-card" href="/education">
-            <h3> 📚 Academy </h3>
-            <p>Learn investing step by step through structured educational levels.</p>
-        </a>
-
-        <a class="platform-card" href="/riskprofile">
-            <h3> ☣️ Risk Profile </h3>
-            <p>Get a suggested allocation based on your goals and tolerance for risk.</p>
-        </a>
-
-        <a class="platform-card" href="/savingcalc">
-            <h3> 💰 Savings Calculator </h3>
-            <p>Estimate how your savings may grow over time with different inputs.</p>
-        </a>
+        <div class="home-hero-visual">
+            <img src="images/investEasy.png" class="home-logo" alt="InvestEasy logo, since 2026" width="360" height="360" />
+        </div>
     </div>
 </section>
+
+<section class="page-container" aria-labelledby="platform-heading">
+    <div class="section-header">
+        <h2 id="platform-heading" class="section-title"> Explore the platform </h2>
+        <p class="section-subtitle">
+            Everything you need to build knowledge, follow the markets and make a plan.
+        </p>
+    </div>
+
+    <ul class="card-grid">
+        @foreach (var card in cards)
+        {
+            <li>
+                <a class="link-card" href="@card.Href">
+                    <span class="icon-tile" aria-hidden="true"><i class="bi @card.Icon"></i></span>
+                    <div class="link-card-text">
+                        <h3> @card.Title </h3>
+                        <p> @card.Description </p>
+                    </div>
+                    <span class="link-card-cta" aria-hidden="true">
+                        Open <i class="bi bi-arrow-right"></i>
+                    </span>
+                </a>
+            </li>
+        }
+    </ul>
+</section>
+
+@code {
+    private record PlatformCard(string Title, string Description, string Icon, string Href);
+
+    private readonly List<PlatformCard> cards = new()
+    {
+        new("Market", "Follow market news, major indexes and popular stocks in one place.", "bi-graph-up", "/market"),
+        new("My Watchlist", "Track selected stocks and see how they move day by day.", "bi-eye", "/market/watchlist"),
+        new("Academy", "Learn investing step by step through three structured levels.", "bi-mortarboard", "/education"),
+        new("Risk Profile", "Get a suggested allocation based on your goals and risk tolerance.", "bi-pie-chart", "/riskprofile"),
+        new("Saving Calculator", "Estimate how your savings can grow over time with compound interest.", "bi-piggy-bank", "/savingcalc")
+    };
+}

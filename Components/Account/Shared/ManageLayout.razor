@@ -1,16 +1,17 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 @layout InvestEasy.Components.Layout.MainLayout
 
-<h1 style="text-align: center; margin-top: 70px;">Manage your account</h1>
+<PageHeader Title="Manage your account" Icon="bi-person-gear" Eyebrow="Account">
+    Update your profile, password and security settings.
+</PageHeader>
 
-<div>
-    <hr />
-    <div class="row">
-        <div class="col-lg-3">
+<div class="page-container">
+    <div class="manage-layout">
+        <aside class="manage-nav" aria-label="Account settings">
             <ManageNavMenu />
-        </div>
-        <div class="col-lg-9">
+        </aside>
+        <section class="panel manage-body">
             @Body
-        </div>
+        </section>
     </div>
 </div>

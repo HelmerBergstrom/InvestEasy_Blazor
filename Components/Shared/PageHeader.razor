@@ -1,0 +1,48 @@
+@* Shared page heading used at the top of every page, so all pages start the same way. *@
+<header class="page-hero @Width">
+    @if (!string.IsNullOrWhiteSpace(BackHref))
+    {
+        <a class="back-link" href="@BackHref">
+            <i class="bi bi-arrow-left" aria-hidden="true"></i> @BackText
+        </a>
+    }
+
+    <div class="page-hero-body">
+        @if (!string.IsNullOrWhiteSpace(Icon))
+        {
+            <span class="page-hero-icon" aria-hidden="true"><i class="bi @Icon"></i></span>
+        }
+
+        <div class="page-hero-text">
+            @if (!string.IsNullOrWhiteSpace(Eyebrow))
+            {
+                <p class="page-eyebrow">@Eyebrow</p>
+            }
+            <h1 class="page-title">@Title</h1>
+            @if (ChildContent is not null)
+            {
+                <p class="page-subtitle">@ChildContent</p>
+            }
+        </div>
+    </div>
+</header>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+
+    // Bootstrap icon class, ex: "bi-piggy-bank".
+    [Parameter] public string? Icon { get; set; }
+
+    // Small label above the title, ex: "Tools".
+    [Parameter] public string? Eyebrow { get; set; }
+
+    // Optional link back to a parent page.
+    [Parameter] public string? BackHref { get; set; }
+    [Parameter] public string BackText { get; set; } = "Back";
+
+    // Matches the width of the page content: "" (default), "narrow" or "form-width".
+    [Parameter] public string Width { get; set; } = "";
+
+    // Subtitle text.
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

@@ -8,118 +8,131 @@
 
 <PageTitle>Academy</PageTitle>
 
-@if (isLoading)
-{
-    <p> Loading... </p>
-}
-else if (!string.IsNullOrWhiteSpace(errorMessage))
-{
-    <p> @errorMessage </p>
-}
-else if (progress is not null)
-{
-    <div class="page-header">
-        <h1 class="page-title"> Academy </h1>
-        <p class="page-subtitle">
-            Learn the fundamentals of investing with InvestEasy´s Academy
+<PageHeader Title="Academy" Icon="bi-mortarboard" Eyebrow="Learn">
+    Learn the fundamentals of investing step by step. Complete a level to unlock the next one.
+</PageHeader>
+
+<div class="page-container">
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <p class="message error" role="alert">
+            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i> @errorMessage
         </p>
-    </div>
-
-    <section class="levels">
-
-        <div class="level-card available-card">
-            <div class="level-card-header">
-                <span class="level-badge"> Level 1 </span>
-                <span class="level-status completed-status">@(progress.Level1Completed ? "Completed" : "Available")</span>
+    }
+    else if (progress is not null)
+    {
+        <!-- Progress overview -->
+        <section class="panel progress-panel" aria-labelledby="progress-heading">
+            <div class="progress-text">
+                <h2 id="progress-heading" class="panel-title"> Your progress </h2>
+                <p>
+                    @if (CompletedCount == levels.Count)
+                    {
+                        <text>You have completed every level. Great work!</text>
+                    }
+                    else
+                    {
+                        <text>@CompletedCount of @levels.Count levels completed. Next up: <strong>Level @NextLevel</strong>.</text>
+                    }
+                </p>
             </div>
-
-            <h2> The foundation </h2>
-            <p class="level-description">
-                Start with the core concepts of investing and build a strong foundation before
-                moving on to more advanced topics.
-            </p>
-            <p>
-                <strong> Status:</strong>
-                @(progress.Level1Completed ? "Completed" : "Available")
-            </p>
-            <p><strong> Time required: </strong> 15 minutes </p>
-
-            <div class="level-footer">
-                <a class="btn btn-primary" href="/education/level1"> Take course </a>
+            <div class="progress-meter">
+                <span class="progress-value">@ProgressPercent%</span>
+                <div class="progress-track" role="progressbar" aria-label="Academy progress"
+                     aria-valuemin="0" aria-valuemax="100" aria-valuenow="@ProgressPercent">
+                    <span class="progress-fill" style="width: @(ProgressPercent)%"></span>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <div class="level-card @(isLevel2Unlocked ? "available-card" : "locked-card")">
-            <div class="level-card-header">
-                <span class="level-badge">Level 2</span>
-                <span class="level-status @(isLevel2Unlocked ? "available-status" : "locked-status")">
-                    @(progress.Level2Completed ? "Completed" : (isLevel2Unlocked ? "Available" : "Locked"))
-                </span>
-            </div>
+        <!-- Levels -->
+        <ol class="levels">
+            @foreach (var level in levels)
+            {
+                bool unlocked = UserProgressService.IsLevelUnlocked(progress, level.Number);
+                bool completed = IsCompleted(level.Number);
 
-            <h2> Move forward </h2>
-            <p class="level-description">
-                Move on to risk, strategy, and portfolio thinking regarding investing. Takes you one step closer to
-                full understanding of investing smart.
-            </p>
-            <p>
-                <strong> Status:</strong>
-                @(progress.Level2Completed ? "Completed" : (isLevel2Unlocked ? "Available" : "Locked"))
-            </p>
-            <p><strong> Time required:</strong> 10 minutes</p>
+                <li class="level-card @(unlocked ? "" : "locked") @(completed ? "completed" : "")">
+                    <div class="level-card-header">
+                        <span class="level-number" aria-hidden="true">
+                            @if (completed)
+                            {
+                                <i class="bi bi-check-lg"></i>
+                            }
+                            else
+                            {
+                                @level.Number
+                            }
+                        </span>
 
-            <div class="level-footer">
-                @if (isLevel2Unlocked)
-                {
-                    <a class="btn btn-primary" href="/education/level2"> Take course </a>
-                }
-                else
-                {
-                    <button class="btn btn-secondary" type="button" disabled> Locked </button>
-                }
-            </div>
-        </div>
+                        @if (completed)
+                        {
+                            <span class="pill pill-success"><i class="bi bi-check-circle" aria-hidden="true"></i> Completed </span>
+                        }
+                        else if (unlocked)
+                        {
+                            <span class="pill pill-info"><i class="bi bi-play-circle" aria-hidden="true"></i> Available </span>
+                        }
+                        else
+                        {
+                            <span class="pill pill-muted"><i class="bi bi-lock" aria-hidden="true"></i> Locked </span>
+                        }
+                    </div>
 
-        <div class="level-card @(isLevel3Unlocked ? "available-card" : "locked-card")">
-            <div class="level-card-header">
-                <span class="level-badge">Level 3</span>
-                <span class="level-status @(isLevel3Unlocked ? "available-status" : "locked-status")">
-                    @(progress.Level3Completed ? "Completed" : (isLevel3Unlocked ? "Available" : "Locked"))
-                </span>
-            </div>
+                    <p class="level-label"> Level @level.Number </p>
+                    <h2> @level.Title </h2>
+                    <p class="level-description"> @level.Description </p>
 
-            <h2> Knowledge </h2>
-            <p class="level-description">
-                Apply what you have learned so far and deepen your understanding by exploring more advanced investment
-                strategies and concepts.
-            </p>
-            <p>
-                <strong> Status:</strong>
-                @(progress.Level3Completed ? "Completed" : (isLevel3Unlocked ? "Available" : "Locked"))
-            </p>
-            <p><strong> Time required:</strong> 10 minutes</p>
+                    <p class="level-meta">
+                        <i class="bi bi-clock" aria-hidden="true"></i> @level.Minutes minutes
+                    </p>
 
-            <div class="level-footer">
-                @if (isLevel3Unlocked)
-                {
-                    <a class="btn btn-primary" href="/education/level3"> Take course </a>
-                }
-                else
-                {
-                    <button class="btn btn-secondary" type="button" disabled> Locked </button>
-                }
-            </div>
-        </div>
-    </section>
-}
+                    <div class="level-footer">
+                        @if (unlocked)
+                        {
+                            <a class="btn @(completed ? "btn-outline" : "btn-primary-action")" href="@($"/education/level{level.Number}")">
+                                @(completed ? "Review level" : "Start level")
+                                <span class="visually-hidden"> @level.Number</span>
+                                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <p class="locked-hint">
+                                <i class="bi bi-lock" aria-hidden="true"></i> Complete level @(level.Number - 1) to unlock
+                            </p>
+                        }
+                    </div>
+                </li>
+            }
+        </ol>
+    }
+</div>
 
 @code {
     private UserProgressModel? progress;
-    private bool isLoading = true;
     private string? errorMessage;
 
-    private bool isLevel2Unlocked;
-    private bool isLevel3Unlocked;
+    private record Level(int Number, string Title, string Description, int Minutes);
+
+    private readonly List<Level> levels = new()
+    {
+        new(1, "The foundation", "Start with the core concepts of investing and build a strong foundation before moving on to more advanced topics.", 15),
+        new(2, "Move forward", "Move on to risk, strategy and portfolio thinking. Takes you one step closer to a full understanding of smart investing.", 10),
+        new(3, "Knowledge", "Apply what you have learned and deepen your understanding with more advanced investment strategies and concepts.", 10)
+    };
+
+    private bool IsCompleted(int levelNumber) => levelNumber switch
+    {
+        1 => progress!.Level1Completed,
+        2 => progress!.Level2Completed,
+        3 => progress!.Level3Completed,
+        _ => false
+    };
+
+    private int CompletedCount => levels.Count(l => IsCompleted(l.Number));
+    private int ProgressPercent => (int)Math.Round(100.0 * CompletedCount / levels.Count);
+    private int NextLevel => levels.FirstOrDefault(l => !IsCompleted(l.Number))?.Number ?? levels.Count;
 
     protected override async Task OnInitializedAsync()
     {
@@ -136,18 +149,10 @@ else if (progress is not null)
 
             // gets or creates progress
             progress = await UserProgressService.GetOrCreateProgressAsync(userId);
-
-            // checks if level 2 and 3 are completed.
-            isLevel2Unlocked = UserProgressService.IsLevelUnlocked(progress, levelNumber: 2);
-            isLevel3Unlocked = UserProgressService.IsLevelUnlocked(progress, levelNumber: 3);
         }
         catch (Exception ex)
         {
             errorMessage = ex.Message;
-        }
-        finally
-        {
-            isLoading = false;
         }
     }
 }

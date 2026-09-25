@@ -1,0 +1,22 @@
+@* Price change with arrow and sign, so it never relies on color alone. *@
+<span class="change @(IsUp ? "change-up" : "change-down")">
+    <i class="bi @(IsUp ? "bi-caret-up-fill" : "bi-caret-down-fill")" aria-hidden="true"></i>
+    <span class="visually-hidden">@(IsUp ? "Up" : "Down")</span>
+    @if (ShowAbsolute)
+    {
+        @Change.ToString("+0.00;-0.00;0.00")
+        <span class="change-percent">(@ChangePercent.ToString("+0.00;-0.00;0.00")%)</span>
+    }
+    else
+    {
+        @(ChangePercent.ToString("+0.00;-0.00;0.00") + "%")
+    }
+</span>
+
+@code {
+    [Parameter] public decimal Change { get; set; }
+    [Parameter] public decimal ChangePercent { get; set; }
+    [Parameter] public bool ShowAbsolute { get; set; }
+
+    private bool IsUp => Change >= 0;
+}

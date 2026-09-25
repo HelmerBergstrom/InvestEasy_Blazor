@@ -2,47 +2,62 @@
 @using InvestEasy.Models
 @using InvestEasy.Services
 @inject MarketService MarketService
-@using Microsoft.AspNetCore.Components.Routing
 
-<PageTitle> Markets </PageTitle>
+<PageTitle> Market News </PageTitle>
 
-<MarketMenu />
+<MarketMenu Title="Market news" Icon="bi-newspaper"
+            Description="The latest general market news from sources around the world." />
 
-<section class="news-container">
-    @if (isLoading)
+<section class="page-container" aria-label="News articles">
+    @if (!string.IsNullOrWhiteSpace(error))
     {
-        <p style="color: white"> Loading news... </p>
-    }
-    else if (!string.IsNullOrWhiteSpace(error))
-    {
-        <p style="color:#fd5959"> @error </p>
+        <p class="message error" role="alert">
+            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i> Couldn't load the news right now. Please try again later.
+        </p>
     }
     else if (articles.Count == 0)
     {
-        <p> No news available. </p>
+        <div class="empty-state">
+            <i class="bi bi-newspaper" aria-hidden="true"></i>
+            <p> No news available right now. </p>
+        </div>
     }
     else
     {
-        @foreach (NewsArticle a in articles)
-        {
-            <a href="@a.Url" class="news-link-wrapper">
-                <article>
-                    <div class="source-date">
-                        <span>@(a.Source)</span>
-                        <span> - </span>
-                        <span>@ToLocalTime(a.Datetime)</span>
-                    </div>
-                    <div class="headline">
-                        @a.Headline
-                    </div>
-                </article>
-            </a>
-        }
+        <ul class="news-grid">
+            @foreach (NewsArticle a in articles.Take(MaxArticles))
+            {
+                <li>
+                    <a href="@a.Url" class="news-card" target="_blank" rel="noopener noreferrer">
+                        @if (!string.IsNullOrWhiteSpace(a.Image))
+                        {
+                            <img class="news-image" src="@a.Image" alt="" loading="lazy" />
+                        }
+                        <div class="news-body">
+                            <div class="news-meta">
+                                <span class="pill pill-info"> @a.Source </span>
+                                <time datetime="@ToIsoTime(a.Datetime)"> @ToLocalTime(a.Datetime) </time>
+                            </div>
+                            <h2 class="news-headline"> @a.Headline </h2>
+                            @if (!string.IsNullOrWhiteSpace(a.Summary))
+                            {
+                                <p class="news-summary"> @a.Summary </p>
+                            }
+                            <span class="news-cta">
+                                Read article <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+                                <span class="visually-hidden">(opens in a new tab)</span>
+                            </span>
+                        </div>
+                    </a>
+                </li>
+            }
+        </ul>
     }
 </section>
 
 @code {
-    private bool isLoading = true;
+    private const int MaxArticles = 24;
+
     private string? error;
     private List<NewsArticle> articles = new List<NewsArticle>();
 
@@ -57,10 +72,6 @@
         {
             error = ex.Message;
         }
-        finally
-        {
-            isLoading = false;
-        }
     }
 
     // convert date which is unixtime in API, unix-timestamp = seconds passed after 1970-01-01.
@@ -69,4 +80,8 @@
     => DateTimeOffset.FromUnixTimeSeconds(unixSeconds)
     .ToLocalTime()
     .ToString(format: "yyyy-MM-dd HH:mm");
+
+    // Machine readable time for the <time> element.
+    private static string ToIsoTime(long unixSeconds)
+    => DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToString("o");
 }

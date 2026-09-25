@@ -2,4 +2,36 @@
 
 <PageTitle> Market </PageTitle>
 
-<MarketMenu />
+<MarketMenu Title="Market overview" />
+
+<section class="page-container" aria-label="Market sections">
+    <ul class="card-grid">
+        @foreach (var card in cards)
+        {
+            <li>
+                <a class="link-card" href="@card.Href">
+                    <span class="icon-tile" aria-hidden="true"><i class="bi @card.Icon"></i></span>
+                    <div class="link-card-text">
+                        <h2> @card.Title </h2>
+                        <p> @card.Description </p>
+                    </div>
+                    <span class="link-card-cta" aria-hidden="true">
+                        Open <i class="bi bi-arrow-right"></i>
+                    </span>
+                </a>
+            </li>
+        }
+    </ul>
+</section>
+
+@code {
+    private record MarketCard(string Title, string Description, string Icon, string Href);
+
+    private readonly List<MarketCard> cards = new()
+    {
+        new("News", "The latest general market news from sources around the world.", "bi-newspaper", "/market/news"),
+        new("Indexes", "How major indexes, commodities and bitcoin are moving today.", "bi-bar-chart-line", "/market/indexes"),
+        new("Popular stocks", "Prices and daily changes for some of the largest companies.", "bi-building", "/market/stocks"),
+        new("My watchlist", "Search for stocks and follow the ones you care about.", "bi-eye", "/market/watchlist")
+    };
+}

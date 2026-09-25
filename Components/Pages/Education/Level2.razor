@@ -7,13 +7,12 @@
 
 <PageTitle> Level 2 </PageTitle>
 
-<div class="level-page">
-    <div class="page-header">
-        <p class="page-subtitle">
-            Level 2
-        </p>
-        <h1 class="page-title"> Move Forward </h1>
-    </div>
+<PageHeader Title="Move Forward" Eyebrow="Academy · Level 2" Icon="bi-journal-text"
+            BackHref="/education" BackText="Back to Academy" Width="narrow">
+    Read the lesson, check your knowledge with the questions and complete the level to unlock the next one.
+</PageHeader>
+
+<div class="page-container narrow">
 
     <div class="level-content">
 
@@ -74,7 +73,9 @@
         </section>
 
         <div class="complete-task-btn">
-            <button class="btn btn-success" type="button" @onclick="CompleteLevel2Async">Complete Level 2</button>
+            <button class="btn btn-primary-action" type="button" @onclick="CompleteLevel2Async">
+                <i class="bi bi-check2-circle" aria-hidden="true"></i> Complete level 2
+            </button>
         </div>
     </div>
 </div>

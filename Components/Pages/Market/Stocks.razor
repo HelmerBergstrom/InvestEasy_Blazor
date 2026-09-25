@@ -1,62 +1,55 @@
 @page "/market/stocks"
-@using Microsoft.AspNetCore.Components.Routing
 @using InvestEasy.Services
 @using InvestEasy.Models
 @inject MarketService MarketService
 
 <PageTitle> Popular Stocks </PageTitle>
 
-<MarketMenu />
+<MarketMenu Title="Popular stocks" Icon="bi-building" Description="Prices and daily changes for some of the largest companies in the world." />
 
-@foreach (IndexItem index in indexes)
-{
-    <div class="index-card">
-        <h2>@index.Name</h2>
-        @if (index.Quote is null)
+<section class="page-container" aria-label="Popular stocks">
+    <ul class="quote-grid">
+        @foreach (QuoteItem item in items)
         {
-            <span class="loading"> Loading... </span>
+            <li>
+                <QuoteCard Name="@item.Name" Symbol="@item.Symbol" Quote="item.Quote" />
+            </li>
         }
-        else
-        {
-            <span>
-                <p> Current price: @index.Quote.C.ToString(format: "0.00") </p>
-                <p> Change: <span class="@(index.Quote.D >= 0 ? "positive" : "negative")"> @index.Quote.Dp.ToString("0.00")%
-                    </span></p>
-            </span>
-        }
-    </div>
-}
+    </ul>
+
+    <p class="disclaimer">
+        Prices in USD from Finnhub, updated about once a minute. Not a recommendation to buy or sell.
+    </p>
+</section>
 
 @code {
+    private List<QuoteItem> items = new List<QuoteItem>()
+    {
+        new QuoteItem() { Name = "Apple Inc.", Symbol = "AAPL" },
+        new QuoteItem() { Name = "Microsoft Corporation", Symbol = "MSFT" },
+        new QuoteItem() { Name = "Nvidia Corporation", Symbol = "NVDA" },
+        new QuoteItem() { Name = "Amazon.com, Inc.", Symbol = "AMZN" },
+        new QuoteItem() { Name = "Alphabet Inc.", Symbol = "GOOG" },
+        new QuoteItem() { Name = "Meta Platforms, Inc.", Symbol = "META" },
+        new QuoteItem() { Name = "Tesla, Inc.", Symbol = "TSLA" }
+    };
 
-    // Fetches all quotes in parallel, and updates each card as data arrives instead of waiting for everything to arrive.
+    // Fetches all quotes in parallel before the page is rendered.
     protected override async Task OnInitializedAsync()
     {
-        IEnumerable<Task>? tasks = indexes.Select(async index =>
+        IEnumerable<Task> tasks = items.Select(async item =>
         {
-            index.Quote = await MarketService.GetIndexQuoteAsync(index.Symbol);
-            await InvokeAsync(StateHasChanged);
+            item.Quote = await MarketService.GetIndexQuoteAsync(item.Symbol);
         });
 
         await Task.WhenAll(tasks);
     }
-    private List<IndexItem> indexes = new List<IndexItem>()
-{
-new IndexItem() { Name = "Apple Inc.", Symbol = "AAPL" },
-new IndexItem() { Name = "Microsoft Corporation", Symbol = "MSFT" },
-new IndexItem() { Name = "Nvidia Corporation", Symbol = "NVDA" },
-new IndexItem() { Name = "Amazon.com, Inc.", Symbol = "AMZN" },
-new IndexItem() { Name = "Alphabet Inc.", Symbol = "GOOG" },
-new IndexItem() { Name = "Meta Plattforms, Inc.", Symbol = "META" },
-new IndexItem() { Name = "Tesla, Inc.", Symbol = "TSLA" }
-};
 
     // Simple view model representing a stock and its latest quote/numbers
-    public class IndexItem
+    private class QuoteItem
     {
         public string Name { get; set; } = "";
         public string Symbol { get; set; } = "";
         public IndexQuote? Quote { get; set; }
     }
-
 }

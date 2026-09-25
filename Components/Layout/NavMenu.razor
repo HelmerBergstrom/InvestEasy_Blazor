@@ -1,68 +1,78 @@
-﻿@implements IDisposable
+@implements IDisposable
 
 @inject NavigationManager NavigationManager
 
-<header class="nav-container">
-    <nav class="nav-links">
-        <div class="nav-item px-3">
-            <NavLink href="/" class="nav-link" Match="NavLinkMatch.All" ActiveClass="active">
-                Home
-            </NavLink>
-        </div>
+<header class="nav-container" data-nav>
+    <a class="brand" href="/" aria-label="InvestEasy, home">
+        <span class="brand-mark" aria-hidden="true"><i class="bi bi-graph-up-arrow"></i></span>
+        <span class="brand-name">Invest<span class="brand-accent">Easy</span></span>
+    </a>
 
-        <div class="nav-item px-3">
-            <NavLink href="/market" class="nav-link" ActiveClass="active" aria-hidden="true">
-                Market
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink href="/education" class="nav-link" ActiveClass="active">
-                Academy
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink href="/riskProfile" class="nav-link" ActiveClass="active">
-                Risk Profile
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink href="/savingCalc" class="nav-link" ActiveClass="active" aria-hidden="true">
-                Saving Calculator
-            </NavLink>
-        </div>
+    <!-- Toggles the menu on small screens. Handled in wwwroot/js/nav.js. -->
+    <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="main-menu" data-nav-toggle>
+        <i class="bi bi-list icon-open" aria-hidden="true"></i>
+        <i class="bi bi-x-lg icon-close" aria-hidden="true"></i>
+        <span class="visually-hidden">Menu</span>
+    </button>
 
-
-        <AuthorizeView>
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Manage">
-                        Profile
+    <div id="main-menu" class="nav-menu">
+        <nav aria-label="Main">
+            <ul class="nav-links">
+                <li>
+                    <NavLink href="/" class="nav-link" Match="NavLinkMatch.All" ActiveClass="active">
+                        <i class="bi bi-house" aria-hidden="true"></i> Home
                     </NavLink>
-                </div>
-                <div class="nav-item px-3">
+                </li>
+                <li>
+                    <NavLink href="/market" class="nav-link" ActiveClass="active">
+                        <i class="bi bi-graph-up" aria-hidden="true"></i> Market
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink href="/education" class="nav-link" ActiveClass="active">
+                        <i class="bi bi-mortarboard" aria-hidden="true"></i> Academy
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink href="/riskProfile" class="nav-link" ActiveClass="active">
+                        <i class="bi bi-pie-chart" aria-hidden="true"></i> Risk Profile
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink href="/savingCalc" class="nav-link" ActiveClass="active">
+                        <i class="bi bi-piggy-bank" aria-hidden="true"></i> Saving Calculator
+                    </NavLink>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="nav-account">
+            <AuthorizeView>
+                <Authorized>
+                    <NavLink class="account-link" href="Account/Manage" ActiveClass="active" title="@context.User.Identity?.Name">
+                        <i class="bi bi-person-circle" aria-hidden="true"></i>
+                        <span class="account-name">@context.User.Identity?.Name</span>
+                        <span class="visually-hidden">, manage account</span>
+                    </NavLink>
                     <form action="Account/Logout" method="post">
                         <AntiforgeryToken />
                         <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-                        <button type="submit" class="nav-link">
-                            【⏻】
+                        <button type="submit" class="btn-nav btn-nav-ghost">
+                            <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Log out
                         </button>
                     </form>
-                </div>
-            </Authorized>
-            <NotAuthorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Register">
-                        Register
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Login">
-                        Login
-                    </NavLink>
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
-    </nav>
+                </Authorized>
+                <NotAuthorized>
+                    <a class="btn-nav btn-nav-ghost" href="Account/Login">
+                        <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Log in
+                    </a>
+                    <a class="btn-nav btn-nav-primary" href="Account/Register">
+                        Create account
+                    </a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </div>
 </header>
 
 @code {

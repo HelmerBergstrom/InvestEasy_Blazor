@@ -1,5 +1,15 @@
-﻿@page "/not-found"
+@page "/not-found"
 @layout MainLayout
 
-<h3>Not Found</h3>
-<p>Sorry, the content you are looking for does not exist.</p>
+<PageTitle> Page not found </PageTitle>
+
+<PageHeader Title="Page not found" Icon="bi-signpost-split" Eyebrow="404" Width="narrow">
+    Sorry, the page you are looking for doesn't exist or has been moved.
+</PageHeader>
+
+<div class="page-container narrow">
+    <div class="status-actions">
+        <a class="btn btn-primary-action" href="/"><i class="bi bi-house" aria-hidden="true"></i> Go to home</a>
+        <a class="btn btn-outline" href="/market"><i class="bi bi-graph-up" aria-hidden="true"></i> Explore the market</a>
+    </div>
+</div>

@@ -1,96 +1,137 @@
 @page "/market/watchlist"
 @rendermode InteractiveServer
-@using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
-@using Microsoft.AspNetCore.Components.Routing
 @using InvestEasy.Services
 @using InvestEasy.Models
-@inject AuthenticationStateProvider AuthStateProvider
 @inject CurrentUserService CurrentUserService
 @inject MarketService MarketService
 @inject WatchListService WatchListService
 
 <PageTitle> My Watchlist </PageTitle>
 
-<MarketMenu />
+<MarketMenu Title="My watchlist" Icon="bi-eye"
+            Description="Search for stocks and follow the ones you care about in one place." />
 
-<section class="watchlist">
+<div class="page-container">
 
-    <input placeholder="Search stocks (Apple, Microsoft...)" @bind="searchQuery" @bind:event="oninput"
-        @onclick="ClearMessage" class="form-control" />
-    <button class="btn btn-primary" @onclick="SearchAsync" disabled="@isSearching">
-        @(isSearching ? "Searching..." : "Search")
-    </button>
+    <!-- Search -->
+    <section class="panel" aria-labelledby="search-heading">
+        <h2 id="search-heading" class="panel-title"> Add stocks </h2>
 
-    @if (searchResults.Count > 0)
-    {
-        <h2> Search Results </h2>
+        <form class="search-form" role="search" @onsubmit="SearchAsync">
+            <label for="stock-search" class="visually-hidden"> Search for a stock by name or symbol </label>
+            <div class="search-input">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                <input id="stock-search" class="form-input" type="search" autocomplete="off"
+                       placeholder="Search stocks, ex: Apple, Microsoft or TSLA"
+                       @bind="searchQuery" @bind:event="oninput" @onfocus="ClearMessage" />
+            </div>
+            <button class="btn btn-primary-action" type="submit" disabled="@isSearching">
+                @(isSearching ? "Searching..." : "Search")
+            </button>
+        </form>
 
-        @foreach (SymbolSearchItem result in searchResults.Take(count: 10))
+        <div role="status">
+            @if (!string.IsNullOrWhiteSpace(message))
+            {
+                <p class="message @(messageIsError ? "error" : "success")">
+                    <i class="bi @(messageIsError ? "bi-info-circle" : "bi-check2-circle")" aria-hidden="true"></i> @message
+                </p>
+            }
+        </div>
+
+        @if (searchResults.Count > 0)
         {
-            <div class="index-card">
+            <h3 class="results-title"> Search results <span class="muted">(@Math.Min(searchResults.Count, 10))</span></h3>
 
-                <div>
-                    <strong>@result.Description</strong>
-                    <p>@result.Symbol - @result.Type</p>
-                </div>
+            <ul class="stock-list">
+                @foreach (SymbolSearchItem result in searchResults.Take(count: 10))
+                {
+                    bool alreadyAdded = watchListItems.Any(w => w.Symbol == result.Symbol?.Trim().ToUpperInvariant());
 
-                <button class="btn btn-success" @onclick="() => AddToWatchlist(result)">
-                    ADD
-                </button>
+                    <li class="stock-row">
+                        <div class="stock-name">
+                            <strong> @result.Description </strong>
+                            <span class="stock-meta"><span class="symbol">@result.Symbol</span> @result.Type </span>
+                        </div>
+
+                        @if (alreadyAdded)
+                        {
+                            <span class="pill pill-success"><i class="bi bi-check2" aria-hidden="true"></i> In watchlist </span>
+                        }
+                        else
+                        {
+                            <button class="btn btn-outline" type="button" aria-label="@($"Add {result.Description} to watchlist")"
+                                    @onclick="() => AddToWatchlist(result)">
+                                <i class="bi bi-plus-lg" aria-hidden="true"></i> Add
+                            </button>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+
+    <!-- Watchlist -->
+    <section aria-labelledby="watchlist-heading">
+        <div class="section-header">
+            <h2 id="watchlist-heading" class="section-title">
+                My watchlist
+                @if (watchListItems.Count > 0)
+                {
+                    <span class="count-badge"> @watchListItems.Count </span>
+                }
+            </h2>
+            @if (watchListItems.Count > 0)
+            {
+                <p class="section-subtitle">
+                    Today: <strong>@UpCount up</strong> and <strong>@DownCount down</strong>. Prices in USD.
+                </p>
+            }
+        </div>
+
+        @if (watchListItems.Count == 0)
+        {
+            <div class="empty-state">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+                <p> No saved stocks yet. Search above and add stocks to follow them here. </p>
             </div>
         }
-    }
-
-    @if (!string.IsNullOrWhiteSpace(message))
-    {
-        <p class="message-text">@message</p>
-    }
-
-    <h2> My Watchlist </h2>
-
-
-    @if (watchListItems.Count == 0)
-    {
-        <p style="display: flex; margin: auto; padding: 1rem; background: #1e293b; border-radius: 10px;">
-            No saved stocks yet. Search and find stocks to add to the watchlist.
-        </p>
-    }
-    else
-    {
-        @foreach (WatchListItemModel item in watchListItems)
+        else
         {
-            <div class="index-card">
-                <div class="index-card-text">
-                    <strong>@item.Name</strong>
-                    <p>@item.Symbol - @item.Type</p>
-                </div>
+            <ul class="stock-list watchlist">
+                @foreach (WatchListItemModel item in watchListItems)
+                {
+                    <li class="stock-row">
+                        <div class="stock-name">
+                            <strong> @item.Name </strong>
+                            <span class="stock-meta"><span class="symbol">@item.Symbol</span> @item.Type </span>
+                        </div>
 
-                <div class="index-card-values">
-                    @if (watchlistQuotes.TryGetValue(item.Symbol, out IndexQuote? quote) && quote is not null)
-                    {
-                        <p><strong>@quote.C.ToString("0.00")</strong></p>
-                        <span class="@(quote.D >= 0 ? "positive" : "negative")">
-                            @quote.D.ToString("0.00")
-                            (@quote.Dp.ToString("0.00")%)
-                        </span>
-                    }
-                    else
-                    {
-                        <p><strong> No values detected </strong></p>
-                    }
-                </div>
+                        <div class="stock-values">
+                            @if (watchlistQuotes.TryGetValue(item.Symbol, out IndexQuote? quote) && quote is not null && quote.C > 0)
+                            {
+                                <span class="stock-price"> @quote.C.ToString("N2") </span>
+                                <ChangeBadge Change="quote.D" ChangePercent="quote.Dp" ShowAbsolute="true" />
+                            }
+                            else
+                            {
+                                <span class="muted"> No price data </span>
+                            }
+                        </div>
 
-                <button class="btn btn-secondary" @onclick="() => RemoveFromWatchList(item.Id)">
-                    🗑️
-                </button>
-            </div>
+                        <button class="btn btn-ghost btn-icon" type="button" aria-label="@($"Remove {item.Name} from watchlist")"
+                                title="Remove" @onclick="() => RemoveFromWatchList(item.Id)">
+                            <i class="bi bi-trash3" aria-hidden="true"></i>
+                        </button>
+                    </li>
+                }
+            </ul>
         }
-    }
-
-</section>
+    </section>
+</div>
 
 @code {
     private List<WatchListItemModel> watchListItems = new List<WatchListItemModel>();
@@ -98,6 +139,11 @@
     private Dictionary<string, IndexQuote?> watchlistQuotes = new Dictionary<string, IndexQuote?>();
 
     private string? message;
+    private bool messageIsError;
+
+    // Number of stocks in the watchlist that are up or down today.
+    private int UpCount => watchListItems.Count(i => watchlistQuotes.GetValueOrDefault(i.Symbol) is { C: > 0, D: >= 0 });
+    private int DownCount => watchListItems.Count(i => watchlistQuotes.GetValueOrDefault(i.Symbol) is { C: > 0, D: < 0 });
     private string searchQuery = "";
     private bool isSearching;
 
@@ -151,11 +197,19 @@
         try
         {
             searchResults = await MarketService.SearchSymbolAsync(searchQuery);
+
+            if (searchResults.Count == 0)
+            {
+                message = $"No stocks found for \"{searchQuery}\".";
+                messageIsError = true;
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
             searchResults = new List<SymbolSearchItem>();
+            message = "The search failed. Please try again.";
+            messageIsError = true;
         }
         finally
         {
@@ -185,7 +239,8 @@
         item.Type
         );
 
-        message = added ? "Stock added to watchlist." : "That stock is already in your watchlist.";
+        message = added ? $"{item.Description} was added to your watchlist." : "That stock is already in your watchlist.";
+        messageIsError = !added;
 
         // reset search UI after adding
         searchQuery = "";
@@ -204,7 +259,12 @@
             return;
         }
 
+        WatchListItemModel? removed = watchListItems.FirstOrDefault(i => i.Id == id);
+
         await WatchListService.RemoveAsync(userId, id);
         await LoadWatchListAsync();
+
+        message = $"{removed?.Name ?? "The stock"} was removed from your watchlist.";
+        messageIsError = false;
     }
 }

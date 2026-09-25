@@ -12,101 +12,57 @@
 
 <PageTitle> Risk Profile </PageTitle>
 
-<div class="page-header">
-    <h1 class="page-title"> Risk Profile </h1>
-    <p class="page-subtitle">
-        Answer a few questions to get a suggested portfolio allocation based on your goals and risk tolerance.
+<PageHeader Title="Risk Profile" Icon="bi-pie-chart" Eyebrow="Tools" Width="narrow">
+    Answer four quick questions to get a suggested portfolio allocation based on your goals and risk tolerance.
+</PageHeader>
+
+<div class="page-container narrow">
+
+    @if (!hasResult)
+    {
+        <section aria-label="Questions">
+            <RiskProfileQA Model="model" OnAnswerChanged="StateHasChanged" @key="model" />
+
+            <div class="calculate-row">
+                <button class="btn btn-primary-action btn-lg" @onclick="CalculateProfile" disabled="@(!CanCalculate)">
+                    <i class="bi bi-calculator" aria-hidden="true"></i> Calculate risk profile
+                </button>
+                @if (!CanCalculate)
+                {
+                    <p class="muted"> Answer all four questions to continue. </p>
+                }
+            </div>
+        </section>
+    }
+    else
+    {
+        <ProfileResult Profile="model" Heading="Suggested risk profile">
+            <div class="result-actions">
+                <button class="btn btn-primary-action" @onclick="SaveRiskProfile">
+                    <i class="bi bi-bookmark" aria-hidden="true"></i> Save profile
+                </button>
+                <button class="btn btn-outline" @onclick="ResetRiskProfile">
+                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Try again
+                </button>
+            </div>
+        </ProfileResult>
+    }
+
+    <div role="status">
+        @if (!string.IsNullOrWhiteSpace(saveMessage))
+        {
+            <p class="message success"><i class="bi bi-check2-circle" aria-hidden="true"></i> @saveMessage </p>
+        }
+    </div>
+
+    @if (savedProfile is not null)
+    {
+        <div class="saved-profile">
+            <ProfileResult Profile="savedProfile" Heading="Your current risk profile" SavedDate="savedProfile.CreatedUtc" />
+        </div>
+    }
+
+    <p class="disclaimer">
+        The suggestion is a simplified guide for educational purposes and not financial advice.
     </p>
 </div>
-
-@if (!hasResult)
-{
-
-    <RiskProfileQA Model="model" OnAnswerChanged="StateHasChanged" @key="model" />
-
-    <div class="calculate-btn">
-        <button class="btn btn-primary" @onclick="CalculateProfile" disabled="@(!CanCalculate)">
-            Calculate Risk Profile
-        </button>
-    </div>
-}
-
-
-@if (hasResult)
-{
-    <section class="risk-result">
-
-        <h2> Suggested Risk Profile </h2>
-
-        <div class="calculated-results">
-
-            <p><strong> Profile: </strong> @model.ProfileName </p>
-
-            <AllocationChart Profile="model" />
-
-
-            <div class="result-div">
-                <strong><span class="swatch stocks"></span> Stocks </strong>
-                <p>@model.StocksPercentage%</p>
-            </div>
-
-            <div class="result-div">
-                <strong><span class="swatch funds"></span> Funds </strong>
-                <p>@model.FundsPercentage%</p>
-            </div>
-
-            <div class="result-div">
-                <strong><span class="swatch low-risk"></span> Low risk / savings </strong>
-                <p>@model.MinimalRiskPercentage%</p>
-            </div>
-
-        </div>
-
-        <div class="result-actions">
-            <button class="btn btn-success" @onclick="SaveRiskProfile">
-                Save
-            </button>
-
-            <button class="btn btn-secondary" @onclick="ResetRiskProfile">
-                Try Again
-            </button>
-        </div>
-
-    </section>
-}
-
-@if (!string.IsNullOrWhiteSpace(saveMessage))
-{
-    <p class="save-message"> @saveMessage </p>
-}
-
-@if (savedProfile is not null)
-{
-    <section class="risk-result">
-        <h2> Your Current Risk Profile </h2>
-
-        <div class="calculated-results">
-
-            <p><strong> Profile: </strong> @savedProfile.ProfileName </p>
-
-            <AllocationChart Profile="savedProfile" />
-
-
-            <div class="result-div">
-                <strong><span class="swatch stocks"></span> Stocks </strong>
-                <p> @savedProfile.StocksPercentage% </p>
-            </div>
-
-            <div class="result-div">
-                <strong><span class="swatch funds"></span> Funds </strong>
-                <p> @savedProfile.FundsPercentage% </p>
-            </div>
-
-            <div class="result-div">
-                <strong><span class="swatch low-risk"></span> Low risk / savings </strong>
-                <p> @savedProfile.MinimalRiskPercentage% </p>
-            </div>
-        </div>
-    </section>
-    <br />
-}

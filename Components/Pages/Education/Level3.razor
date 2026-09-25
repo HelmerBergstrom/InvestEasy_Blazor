@@ -7,13 +7,12 @@
 
 <PageTitle> Level 3 </PageTitle>
 
-<div class="level-page">
-    <div class="page-header">
-        <p class="page-subtitle">
-            Level 3
-        </p>
-        <h1 class="page-title"> Knowledge </h1>
-    </div>
+<PageHeader Title="Knowledge" Eyebrow="Academy · Level 3" Icon="bi-journal-text"
+            BackHref="/education" BackText="Back to Academy" Width="narrow">
+    Read the lesson, check your knowledge with the questions and complete the level to unlock the next one.
+</PageHeader>
+
+<div class="page-container narrow">
 
     <div class="level-content">
 
@@ -92,7 +91,9 @@
         </section>
 
         <div class="complete-task-btn">
-            <button class="btn btn-success" type="button" @onclick="CompleteLevel3Async">Complete Level 3</button>
+            <button class="btn btn-primary-action" type="button" @onclick="CompleteLevel3Async">
+                <i class="bi bi-check2-circle" aria-hidden="true"></i> Complete level 3
+            </button>
         </div>
     </div>
 </div>

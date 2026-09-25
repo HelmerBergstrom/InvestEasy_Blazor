@@ -8,12 +8,9 @@
 
 <PageTitle> Saving Calculator </PageTitle>
 
-<div class="page-header">
-    <h1 class="page-title">Saving Calculator</h1>
-    <p class="page-subtitle">
-        Plan, compare and estimate long-term savings. Adjust the values and see the result update instantly.
-    </p>
-</div>
+<PageHeader Title="Saving Calculator" Icon="bi-piggy-bank" Eyebrow="Tools">
+    Plan, compare and estimate long-term savings. Adjust the values and see the result update instantly.
+</PageHeader>
 
 <div class="calc-layout">
 
@@ -203,11 +200,25 @@
 @if (editingScenarioId is null)
 {
     <section class="saved-section" aria-labelledby="saved-heading">
-        <h2 id="saved-heading" class="saved-title"> Saved scenarios </h2>
+        <div class="section-header">
+            <div>
+                <h2 id="saved-heading" class="section-title">
+                    Saved scenarios
+                    @if (savedScenarios.Any())
+                    {
+                        <span class="count-badge"> @savedScenarios.Count </span>
+                    }
+                </h2>
+                <p class="section-subtitle"> Compare your plans side by side. Edit a scenario to load it into the calculator. </p>
+            </div>
+        </div>
 
         @if (!savedScenarios.Any())
         {
-            <p class="empty-state"> No saved scenarios yet. Give your plan a name and click <strong>Save scenario</strong>. </p>
+            <div class="empty-state">
+                <i class="bi bi-bookmark-plus" aria-hidden="true"></i>
+                <p> No saved scenarios yet. Give your plan a name and click <strong>Save scenario</strong>. </p>
+            </div>
         }
         else
         {
@@ -216,38 +227,63 @@
                 {
                     var value = CalculatorService.CalculateFutureValue(s.MonthlyAmount, s.InitialAmount, s.SavingHorizon, s.ExpectedReturnPercent);
                     var invested = CalculatorService.CalculateTotalInvestment(s.MonthlyAmount, s.InitialAmount, s.SavingHorizon);
+                    var returns = Math.Max(0, value - invested);
 
                     <li class="scenario-card">
                         <div class="scenario-head">
-                            <h3> @s.Name </h3>
-                            <span class="scenario-date"> @s.CreatedDate.ToLocalTime().ToString("yyyy-MM-dd") </span>
+                            <span class="icon-tile" aria-hidden="true"><i class="bi bi-piggy-bank"></i></span>
+                            <div class="scenario-heading">
+                                <h3> @s.Name </h3>
+                                <span class="scenario-date"> Saved @s.CreatedDate.ToLocalTime().ToString("yyyy-MM-dd") </span>
+                            </div>
                         </div>
 
-                        <p class="scenario-value"> @value.ToString("N0") kr </p>
+                        <div class="scenario-result">
+                            <span class="scenario-result-label"> Estimated value after @s.SavingHorizon @(s.SavingHorizon == 1 ? "year" : "years") </span>
+                            <span class="scenario-value"> @value.ToString("N0") <span class="scenario-unit">kr</span></span>
+                        </div>
 
-                        <div class="mini-bar" aria-hidden="true">
-                            <span class="seg invested" style="flex-grow: @Invariant(invested)"></span>
-                            @if (value > invested)
-                            {
-                                <span class="seg returns" style="flex-grow: @Invariant(value - invested)"></span>
-                            }
+                        <div class="composition">
+                            <div class="mini-bar" aria-hidden="true">
+                                <span class="seg invested" style="flex-grow: @Invariant(invested)"></span>
+                                @if (returns > 0)
+                                {
+                                    <span class="seg returns" style="flex-grow: @Invariant(returns)"></span>
+                                }
+                            </div>
+                            <div class="composition-legend">
+                                <span><span class="swatch invested"></span> Invested <strong>@invested.ToString("N0") kr</strong></span>
+                                <span><span class="swatch returns"></span> Returns <strong>@returns.ToString("N0") kr</strong></span>
+                            </div>
                         </div>
 
                         <dl class="scenario-facts">
-                            <div><dt> Monthly </dt><dd> @s.MonthlyAmount.ToString("N0") kr </dd></div>
-                            <div><dt> Initial </dt><dd> @s.InitialAmount.ToString("N0") kr </dd></div>
-                            <div><dt> Horizon </dt><dd> @s.SavingHorizon years </dd></div>
-                            <div><dt> Return </dt><dd> @s.ExpectedReturnPercent% </dd></div>
+                            <div>
+                                <dt><i class="bi bi-calendar3" aria-hidden="true"></i> Monthly </dt>
+                                <dd> @s.MonthlyAmount.ToString("N0") kr </dd>
+                            </div>
+                            <div>
+                                <dt><i class="bi bi-wallet2" aria-hidden="true"></i> Initial </dt>
+                                <dd> @s.InitialAmount.ToString("N0") kr </dd>
+                            </div>
+                            <div>
+                                <dt><i class="bi bi-hourglass-split" aria-hidden="true"></i> Horizon </dt>
+                                <dd> @s.SavingHorizon years </dd>
+                            </div>
+                            <div>
+                                <dt><i class="bi bi-graph-up-arrow" aria-hidden="true"></i> Return </dt>
+                                <dd> @s.ExpectedReturnPercent% / year </dd>
+                            </div>
                         </dl>
 
                         <div class="scenario-actions">
                             <button class="btn btn-outline" type="button" aria-label="@($"Edit scenario {s.Name}")"
                                     @onclick="() => StartEditScenario(s.Id)">
-                                Edit
+                                <i class="bi bi-pencil" aria-hidden="true"></i> Edit
                             </button>
                             <button class="btn btn-danger-outline" type="button" aria-label="@($"Delete scenario {s.Name}")"
                                     @onclick="() => DeleteScenario(s.Id)">
-                                Delete
+                                <i class="bi bi-trash3" aria-hidden="true"></i> Delete
                             </button>
                         </div>
                     </li>

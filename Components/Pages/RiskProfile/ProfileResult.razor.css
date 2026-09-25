@@ -1,0 +1,87 @@
+.profile-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.profile-eyebrow {
+    margin: 0 0 0.2rem 0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.profile-name {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+}
+
+.profile-description {
+    max-width: 62ch;
+    margin: 0.75rem 0 1.5rem 0;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.calculated-results {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.result-div {
+    padding: 0.9rem 1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+}
+
+.result-div strong {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.result-div p {
+    margin: 0.25rem 0 0 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+}
+
+.swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.swatch.stocks {
+    background: var(--allocation-stocks);
+}
+
+.swatch.funds {
+    background: var(--allocation-funds);
+}
+
+.swatch.low-risk {
+    background: var(--allocation-low-risk);
+}
+
+@media (max-width: 600px) {
+    .calculated-results {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

@@ -17,37 +17,44 @@
 
 <PageTitle>Register</PageTitle>
 
-<h1 style="text-align: center; margin-top: 70px;">Register</h1>
+<PageHeader Title="Create account" Icon="bi-person-plus" Eyebrow="Get started">
+    Create a free account to save your plans, follow stocks and track your learning.
+</PageHeader>
 
-<div class="login-wrapper" style="width: 500px; margin: auto;">
-    <div>
-        <StatusMessage Message="@Message" />
-        <EditForm Model="Input" method="post" OnValidSubmit="RegisterUser" FormName="register">
-            <DataAnnotationsValidator />
-            <h2 style="text-align: center; margin-top: 15px;">Create a new account.</h2>
-            <hr />
-            <ValidationSummary class="text-danger" role="alert" />
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username"
-                    aria-required="true" placeholder="name@example.com" />
-                <label for="Input.Email">Email</label>
-                <ValidationMessage For="() => Input.Email" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control"
-                    autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label for="Input.Password">Password</label>
-                <ValidationMessage For="() => Input.Password" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.ConfirmPassword" id="Input.ConfirmPassword"
-                    class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label for="Input.ConfirmPassword">Confirm Password</label>
-                <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
-            </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </EditForm>
-    </div>
+<section class="panel">
+    <StatusMessage Message="@Message" />
+    <EditForm Model="Input" method="post" OnValidSubmit="RegisterUser" FormName="register">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" role="alert" />
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username"
+                aria-required="true" placeholder="name@example.com" />
+            <label for="Input.Email">Email</label>
+            <ValidationMessage For="() => Input.Email" class="text-danger" />
+        </div>
+        <div class="form-floating mb-3">
+            <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control"
+                autocomplete="new-password" aria-required="true" aria-describedby="password-hint" placeholder="password" />
+            <label for="Input.Password">Password</label>
+            <ValidationMessage For="() => Input.Password" class="text-danger" />
+        </div>
+        <div class="form-floating mb-3">
+            <InputText type="password" @bind-Value="Input.ConfirmPassword" id="Input.ConfirmPassword"
+                class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+            <label for="Input.ConfirmPassword">Confirm password</label>
+            <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+        </div>
+        <p id="password-hint" class="form-hint">
+            At least 6 characters, with an uppercase letter, a lowercase letter, a number and a symbol.
+        </p>
+        <button type="submit" class="w-100 btn btn-lg btn-primary">Create account</button>
+    </EditForm>
+</section>
+
+<div class="account-links">
+    <p>
+        Already have an account? <a href="Account/Login">Log in</a>
+    </p>
 </div>
 
 @code {

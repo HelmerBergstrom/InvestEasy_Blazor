@@ -1,51 +1,298 @@
 .nav-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 1.5rem;
-    background: linear-gradient(135deg, #1e293b 0%, #2c3d57 50%, #243447 100%);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     position: fixed;
     top: 0;
-    width: 100%;
+    left: 0;
+    right: 0;
     z-index: 1001;
-    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    height: 64px;
+    padding: 0 1.5rem;
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #1e293b;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Thin green line at the top, a nod to the growth arrow in the logo. */
+.nav-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #22c55e 30%, #22c55e 70%, transparent);
+    opacity: 0.7;
+}
+
+/* Brand */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+    text-decoration: none;
+    border-radius: 10px;
+}
+
+.brand-mark {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(34, 197, 94, 0.14);
+    border: 1px solid rgba(34, 197, 94, 0.45);
+    color: #4ade80;
+    font-size: 1.1rem;
+}
+
+.brand-name {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: white;
+}
+
+.brand-accent {
+    color: #4ade80;
+}
+
+/* Menu: links in the middle, account to the right. */
+.nav-menu {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 1.5rem;
+}
+
+nav {
+    flex: 1;
+    display: flex;
+    justify-content: center;
 }
 
 .nav-links {
     display: flex;
-    gap: 1.25rem;
     align-items: center;
-    flex: 1;
-    justify-content: center;
-    font-size: 16px;
-    color: white;
-    font-weight: 600;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
-.nav-item ::deep {
+.nav-links ::deep .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.85rem;
     border-radius: 10px;
+    color: rgba(226, 232, 240, 0.8);
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.nav-item ::deep a.active {
-    color: rgb(39, 172, 39);
+.nav-links ::deep .nav-link:hover {
+    background: rgba(148, 163, 184, 0.12);
+    color: white;
 }
 
-.nav-item ::deep .nav-link:hover {
-    color: rgb(39, 172, 39);
+.nav-links ::deep .nav-link.active {
+    background: rgba(34, 197, 94, 0.14);
+    color: #4ade80;
+    box-shadow: inset 0 -2px 0 #22c55e;
 }
 
-.nav-link {
-    padding: 0.25rem 0.5rem;
+/* Account */
+.nav-account {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
 }
 
-@media (max-width: 1100px) {
-    .nav-container {
-        position: relative;
+.nav-account form {
+    margin: 0;
+}
+
+.nav-account ::deep .account-link {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    max-width: 220px;
+    padding: 0.45rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid #1e293b;
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(226, 232, 240, 0.9);
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.nav-account ::deep .account-link:hover,
+.nav-account ::deep .account-link.active {
+    border-color: rgba(34, 197, 94, 0.5);
+    color: white;
+}
+
+.nav-account ::deep .account-link i {
+    font-size: 1.15rem;
+    color: #4ade80;
+}
+
+.account-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-nav-ghost {
+    border: 1px solid transparent;
+    background: transparent;
+    color: rgba(226, 232, 240, 0.85);
+}
+
+.btn-nav-ghost:hover {
+    background: rgba(148, 163, 184, 0.12);
+    color: white;
+}
+
+.btn-nav-primary {
+    border: 1px solid #22c55e;
+    background: #22c55e;
+    color: #052e16;
+}
+
+.btn-nav-primary:hover {
+    background: #4ade80;
+    border-color: #4ade80;
+    color: #052e16;
+}
+
+/* Keyboard focus */
+.brand:focus-visible,
+.menu-toggle:focus-visible,
+.btn-nav:focus-visible,
+.nav-links ::deep .nav-link:focus-visible,
+.nav-account ::deep .account-link:focus-visible {
+    outline: 2px solid #86efac;
+    outline-offset: 2px;
+}
+
+/* Hamburger button, only visible on small screens. */
+.menu-toggle {
+    display: none;
+    margin-left: auto;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    border: 1px solid #1e293b;
+    background: rgba(255, 255, 255, 0.04);
+    color: white;
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+.menu-toggle .icon-close {
+    display: none;
+}
+
+.menu-toggle[aria-expanded="true"] .icon-open {
+    display: none;
+}
+
+.menu-toggle[aria-expanded="true"] .icon-close {
+    display: inline;
+}
+
+/* Hides icons in the links on medium screens to save space. */
+@media (max-width: 1250px) {
+    .nav-links ::deep .nav-link i {
+        display: none;
+    }
+
+    .account-name {
+        display: none;
+    }
+}
+
+/* Small screens: hamburger button with a drop-down panel. */
+@media (max-width: 1000px) {
+    .menu-toggle {
+        display: grid;
+        place-items: center;
+    }
+
+    .nav-menu {
+        display: none;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        max-height: calc(100vh - 64px);
+        overflow-y: auto;
+        padding: 1rem 1.25rem 1.5rem 1.25rem;
+        background: #0f172a;
+        border-bottom: 1px solid #1e293b;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .nav-container[data-open] .nav-menu {
+        display: flex;
+    }
+
+    nav {
+        justify-content: stretch;
     }
 
     .nav-links {
         flex-direction: column;
-        gap: 1rem;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .nav-links ::deep .nav-link {
+        padding: 0.8rem 1rem;
+        font-size: 1rem;
+    }
+
+    .nav-links ::deep .nav-link i,
+    .account-name {
+        display: inline;
+    }
+
+    .nav-links ::deep .nav-link.active {
+        box-shadow: inset 3px 0 0 #22c55e;
+    }
+
+    .nav-account {
+        flex-wrap: wrap;
+        padding-top: 1rem;
+        border-top: 1px solid #1e293b;
+    }
+
+    .nav-account ::deep .account-link {
+        max-width: 100%;
     }
 }

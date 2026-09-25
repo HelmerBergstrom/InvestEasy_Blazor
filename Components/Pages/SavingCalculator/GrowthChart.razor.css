@@ -64,7 +64,7 @@
     right: 8px;
     transform: translateY(50%);
     font-size: 0.75rem;
-    color: #94a3b8;
+    color: var(--text-muted);
     font-variant-numeric: tabular-nums;
 }
 
@@ -127,7 +127,7 @@
     left: 50%;
     transform: translateX(-50%);
     font-size: 0.75rem;
-    color: #94a3b8;
+    color: var(--text-muted);
     white-space: nowrap;
 }
 
@@ -135,7 +135,7 @@
     margin: -0.75rem 0 0.75rem 44px;
     text-align: center;
     font-size: 0.75rem;
-    color: #94a3b8;
+    color: var(--text-muted);
 }
 
 /* Tooltip, shown when hovering a year. */
@@ -219,6 +219,6 @@
 }
 
 .table-view thead th {
-    color: #94a3b8;
+    color: var(--text-muted);
     font-weight: 600;
 }

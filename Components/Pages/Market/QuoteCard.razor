@@ -1,0 +1,67 @@
+@using System.Globalization
+@using InvestEasy.Models
+
+@* Card showing the latest quote for a stock, index or asset. *@
+<article class="quote-card">
+    <div class="quote-head">
+        <div class="quote-name">
+            <h2> @Name </h2>
+            <span class="symbol"> @Symbol </span>
+        </div>
+
+        @if (HasData)
+        {
+            <ChangeBadge Change="Quote!.D" ChangePercent="Quote.Dp" />
+        }
+    </div>
+
+    @if (HasData)
+    {
+        <p class="quote-price">
+            @Quote!.C.ToString("N2") <span class="currency">USD</span>
+        </p>
+
+        @if (Quote.H > Quote.L)
+        {
+            <div class="day-range">
+                <div class="day-range-labels">
+                    <span> Day low <strong>@Quote.L.ToString("N2")</strong></span>
+                    <span> Day high <strong>@Quote.H.ToString("N2")</strong></span>
+                </div>
+                <div class="day-range-track" aria-hidden="true">
+                    <span class="day-range-marker" style="left: @RangePosition"></span>
+                </div>
+            </div>
+        }
+
+        <dl class="quote-facts">
+            <div><dt> Open </dt><dd> @Quote.O.ToString("N2") </dd></div>
+            <div><dt> Previous close </dt><dd> @Quote.Pc.ToString("N2") </dd></div>
+        </dl>
+    }
+    else
+    {
+        <p class="quote-unavailable">
+            <i class="bi bi-cloud-slash" aria-hidden="true"></i> Price data is unavailable right now.
+        </p>
+    }
+</article>
+
+@code {
+    [Parameter, EditorRequired] public string Name { get; set; } = "";
+    [Parameter, EditorRequired] public string Symbol { get; set; } = "";
+    [Parameter] public IndexQuote? Quote { get; set; }
+
+    // Finnhub returns zeros for symbols it has no data for.
+    private bool HasData => Quote is not null && Quote.C > 0;
+
+    // Where today's price is between the day's low and high, ex. "65%".
+    private string RangePosition
+    {
+        get
+        {
+            decimal position = (Quote!.C - Quote.L) / (Quote.H - Quote.L) * 100;
+            return Math.Clamp(position, 0, 100).ToString("0.#", CultureInfo.InvariantCulture) + "%";
+        }
+    }
+}

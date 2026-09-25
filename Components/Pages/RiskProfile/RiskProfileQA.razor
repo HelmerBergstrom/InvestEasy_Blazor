@@ -1,109 +1,40 @@
 @using InvestEasy.Models
+
+@* The four risk profile questions. Each question is a radio group, so it works with keyboard and screen readers. *@
+<p class="answered-count" role="status">
+    <strong>@AnsweredCount of @questions.Count</strong> questions answered
+</p>
+
 <div class="risk-profile-grid">
+    @for (int q = 0; q < questions.Count; q++)
+    {
+        var question = questions[q];
+        int number = q + 1;
+        int selected = question.Get(Model);
 
-    <!-- Question 1 -->
-    <section class="question-card">
-        <h3> When do you expect to use this money? </h3>
+        <fieldset class="question-card @(selected >= 0 ? "answered" : "")">
+            <legend>
+                <span class="question-number" aria-hidden="true">@number</span>
+                <span class="visually-hidden">Question @number of @questions.Count: </span>
+                @question.Text
+            </legend>
 
-        <label>
-            <input type="radio" name="time" @onclick="() => SetTimeHorizon(0)">
-            Within 1 year
-        </label>
+            <div class="options">
+                @for (int o = 0; o < question.Options.Length; o++)
+                {
+                    int value = o;
+                    string id = $"{question.Name}-{value}";
 
-        <label>
-            <input type="radio" name="time" @onclick="() => SetTimeHorizon(1)">
-            1–3 years
-        </label>
-
-        <label>
-            <input type="radio" name="time" @onclick="() => SetTimeHorizon(2)">
-            3–7 years
-        </label>
-
-        <label>
-            <input type="radio" name="time" @onclick="() => SetTimeHorizon(3)">
-            More than 7 years
-        </label>
-    </section>
-
-
-    <!-- Question 2 -->
-    <section class="question-card">
-        <h3>If your investments dropped 20%, what would you do?</h3>
-
-        <label>
-            <input type="radio" name="drop" @onclick="() => SetMarketDropReaction(0)">
-            Sell everything
-        </label>
-
-        <label>
-            <input type="radio" name="drop" @onclick="() => SetMarketDropReaction(1)">
-            Sell part of it
-        </label>
-
-        <label>
-            <input type="radio" name="drop" @onclick="() => SetMarketDropReaction(2)">
-            Do nothing
-        </label>
-
-        <label>
-            <input type="radio" name="drop" @onclick="() => SetMarketDropReaction(3)">
-            Invest more
-        </label>
-    </section>
-
-
-    <!-- Question 3 -->
-    <section class="question-card">
-        <h3>What is your main investment goal?</h3>
-
-        <label>
-            <input type="radio" name="goal" @onclick="() => SetInvestmentGoal(0)">
-            Protect my money
-        </label>
-
-        <label>
-            <input type="radio" name="goal" @onclick="() => SetInvestmentGoal(1)">
-            Grow steadily
-        </label>
-
-        <label>
-            <input type="radio" name="goal" @onclick="() => SetInvestmentGoal(2)">
-            Balanced growth
-        </label>
-
-        <label>
-            <input type="radio" name="goal" @onclick="() => SetInvestmentGoal(3)">
-            Maximize growth
-        </label>
-    </section>
-
-
-    <!-- Question 4 -->
-    <section class="question-card">
-        <h3>How experienced are you with investing?</h3>
-
-        <label>
-            <input type="radio" name="exp" @onclick="() => SetExperienceLevel(0)">
-            No experience
-        </label>
-
-        <label>
-            <input type="radio" name="exp" @onclick="() => SetExperienceLevel(1)">
-            Some experience
-        </label>
-
-        <label>
-            <input type="radio" name="exp" @onclick="() => SetExperienceLevel(2)">
-            Comfortable investor
-        </label>
-
-        <label>
-            <input type="radio" name="exp" @onclick="() => SetExperienceLevel(3)">
-            Experienced investor
-        </label>
-    </section>
-
+                    <label class="option" for="@id">
+                        <input type="radio" id="@id" name="@question.Name" value="@value"
+                               checked="@(selected == value)"
+                               @onchange="() => SetAnswer(question, value)" />
+                        <span>@question.Options[o]</span>
+                    </label>
+                }
+            </div>
+        </fieldset>
+    }
 </div>
 
 @code {
@@ -113,27 +44,33 @@
     [Parameter]
     public EventCallback OnAnswerChanged { get; set; }
 
-    private async Task SetTimeHorizon(int value)
-    {
-        Model.TimeHorizon = value;
-        await OnAnswerChanged.InvokeAsync();
-    }
+    // A question, its answers (score 0-3 in order) and which property in the model it sets.
+    private record Question(string Name, string Text, string[] Options, Func<RiskProfileModel, int> Get, Action<RiskProfileModel, int> Set);
 
-    private async Task SetMarketDropReaction(int value)
+    private readonly List<Question> questions = new()
     {
-        Model.MarketDropReaction = value;
-        await OnAnswerChanged.InvokeAsync();
-    }
+        new("time", "When do you expect to use this money?",
+            new[] { "Within 1 year", "1–3 years", "3–7 years", "More than 7 years" },
+            m => m.TimeHorizon, (m, v) => m.TimeHorizon = v),
 
-    private async Task SetInvestmentGoal(int value)
-    {
-        Model.InvestmentGoal = value;
-        await OnAnswerChanged.InvokeAsync();
-    }
+        new("drop", "If your investments dropped 20%, what would you do?",
+            new[] { "Sell everything", "Sell part of it", "Do nothing", "Invest more" },
+            m => m.MarketDropReaction, (m, v) => m.MarketDropReaction = v),
 
-    private async Task SetExperienceLevel(int value)
+        new("goal", "What is your main investment goal?",
+            new[] { "Protect my money", "Grow steadily", "Balanced growth", "Maximize growth" },
+            m => m.InvestmentGoal, (m, v) => m.InvestmentGoal = v),
+
+        new("exp", "How experienced are you with investing?",
+            new[] { "No experience", "Some experience", "Comfortable investor", "Experienced investor" },
+            m => m.ExperienceLevel, (m, v) => m.ExperienceLevel = v)
+    };
+
+    private int AnsweredCount => questions.Count(q => q.Get(Model) >= 0);
+
+    private async Task SetAnswer(Question question, int value)
     {
-        Model.ExperienceLevel = value;
+        question.Set(Model, value);
         await OnAnswerChanged.InvokeAsync();
     }
 }

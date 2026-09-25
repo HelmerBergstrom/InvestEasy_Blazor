@@ -1,142 +1,30 @@
-.risk-disclaimer {
-    max-width: 700px;
-    margin: 20px auto 30px auto;
-    padding: 14px 18px;
-    border-radius: 10px;
-    background-color: rgba(255, 0, 0, 0.60);
-    font-size: 1rem;
-    color: white;
-}
-
-.calculate-btn {
-    display: flex;
-    justify-content: center;
-    margin-top: 40px;
-}
-
-.btn-primary {
-    padding: 0.9rem 2rem;
-    font-weight: 700;
-    margin-bottom: 20px;
-}
-
-.risk-result {
+.calculate-row {
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-width: 700px;
-    margin: 30px auto 0 auto;
-    color: white;
+    gap: 0.5rem;
+    margin-top: 2rem;
 }
 
-.risk-result h2 {
-    margin-bottom: 20px;
-    font-size: 1.5rem;
-    border-top: 2px solid #1e293b;
-    border-width: 100%;
-    padding-top: 2rem;
-}
-
-.risk-result p {
-    margin-bottom: 14px;
-    color: white;
-    font-size: 1rem;
-}
-
-.calculated-results {
-    width: 100%;
-    max-width: 520px;
-    border: 1px solid #1e293b;
-    border-radius: 16px;
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    text-align: center;
-    background: #0f172a;
-
-}
-
-.calculated-results p {
-    margin: 4px 0 0 0;
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: white;
-}
-
-.calculated-results strong {
-    display: block;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: #8aabdc;
-}
-
-.result-div {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(148, 163, 184, 0.5);
-    border-radius: 12px;
-    padding: 0.85rem 0.75rem;
+.calculate-row p {
+    margin: 0;
+    font-size: 0.9rem;
 }
 
 .result-actions {
     display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
 }
 
-.btn-success,
-.btn-secondary {
-    padding: 0.7rem 1.4rem;
-    font-weight: 700;
+.saved-profile {
+    margin-top: 1.5rem;
 }
 
-.save-message {
-    width: 200px;
-    margin: auto;
-    text-align: center;
-    font-size: 1rem;
-    padding: 1rem;
-    background-color: #0f172a;
-    border-radius: 10px;
-}
-
-@media (max-width: 1100px) {
-
-    .calculated-results {
-        max-width: 420px;
-    }
-
-    .result-actions {
-        flex-direction: column;
-        width: 100%;
-        max-width: 300px;
-    }
-
-    .result-actions button {
+@media (max-width: 480px) {
+    .result-actions .btn,
+    .calculate-row .btn {
         width: 100%;
     }
-}
-/* Color markers linking each result box to its segment in AllocationChart. */
-.swatch {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    margin-right: 4px;
-    border-radius: 3px;
-}
-
-.swatch.stocks {
-    background: var(--allocation-stocks);
-}
-
-.swatch.funds {
-    background: var(--allocation-funds);
-}
-
-.swatch.low-risk {
-    background: var(--allocation-low-risk);
 }
