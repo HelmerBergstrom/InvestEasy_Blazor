@@ -1,0 +1,141 @@
+@using System.Globalization
+
+@* Stacked bar chart showing invested amount and returns for each year of a scenario. *@
+@if (Points.Count > 0)
+{
+    <figure class="growth-chart">
+        <figcaption class="chart-header">
+            <span class="chart-title"> Growth year by year </span>
+            <span class="legend">
+                <span class="legend-item"><span class="swatch invested"></span> Invested </span>
+                <span class="legend-item"><span class="swatch returns"></span> Returns </span>
+            </span>
+        </figcaption>
+
+        <div class="plot" role="img" aria-label="@AriaLabel">
+            <div class="y-axis" aria-hidden="true">
+                @foreach (var tick in Ticks)
+                {
+                    <span class="y-label" style="bottom: @Percent(tick)">@Compact(tick)</span>
+                }
+            </div>
+
+            <div class="plot-area" aria-hidden="true">
+                @foreach (var tick in Ticks)
+                {
+                    <span class="gridline @(tick == 0 ? "baseline" : "")" style="bottom: @Percent(tick)"></span>
+                }
+
+                <div class="bars" style="gap: @(Points.Count > 30 ? "1px" : "2px")">
+                    @for (int i = 0; i < Points.Count; i++)
+                    {
+                        var p = Points[i];
+
+                        <div class="bar-col @(i >= Points.Count / 2 ? "tip-left" : "")">
+                            <div class="stack" style="height: @Percent(p.Value)">
+                                @if (p.Returns > 0)
+                                {
+                                    <div class="seg returns" style="flex-grow: @Invariant(p.Returns)"></div>
+                                }
+                                <div class="seg invested" style="flex-grow: @Invariant(p.Invested)"></div>
+                            </div>
+
+                            <div class="tooltip">
+                                <strong> Year @p.Year </strong>
+                                <span><span class="swatch invested"></span> Invested: @p.Invested.ToString("N0") kr </span>
+                                <span><span class="swatch returns"></span> Returns: @p.Returns.ToString("N0") kr </span>
+                                <span class="tooltip-total"> Total: @p.Value.ToString("N0") kr </span>
+                            </div>
+
+                            <span class="x-label">@(ShowYearLabel(p.Year) ? p.Year : "")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <p class="x-title" aria-hidden="true"> Year </p>
+
+        <details class="table-view">
+            <summary> Show as table </summary>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col"> Year </th>
+                        <th scope="col"> Invested </th>
+                        <th scope="col"> Returns </th>
+                        <th scope="col"> Total </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Points)
+                    {
+                        <tr>
+                            <th scope="row"> @p.Year </th>
+                            <td> @p.Invested.ToString("N0") kr </td>
+                            <td> @p.Returns.ToString("N0") kr </td>
+                            <td> @p.Value.ToString("N0") kr </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </details>
+    </figure>
+}
+
+@code {
+    [Parameter, EditorRequired] public List<GrowthPoint> Points { get; set; } = new();
+
+    // Top of the y-axis, rounded up to a "nice" number so the gridlines get even labels.
+    private decimal AxisMax
+    {
+        get
+        {
+            decimal max = Points.Count > 0 ? Points.Max(p => p.Value) : 0;
+            if (max <= 0)
+            {
+                return 1;
+            }
+
+            double rawStep = (double)max / 4;
+            double magnitude = Math.Pow(10, Math.Floor(Math.Log10(rawStep)));
+            double normalized = rawStep / magnitude;
+            double niceStep = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 2.5 ? 2.5 : normalized <= 5 ? 5 : 10;
+            decimal step = (decimal)(niceStep * magnitude);
+
+            return Math.Ceiling(max / step) * step;
+        }
+    }
+
+    private IEnumerable<decimal> Ticks => Enumerable.Range(0, 5).Select(i => AxisMax / 4 * i);
+
+    // Shows every year for short horizons and fewer labels for long ones.
+    private bool ShowYearLabel(int year)
+    {
+        int every = Points.Count <= 12 ? 1 : Points.Count <= 25 ? 5 : 10;
+        return year % every == 0 || (every > 1 && year == 1);
+    }
+
+    // CSS values must use "." as decimal separator regardless of the server culture.
+    private string Percent(decimal value) => (value / AxisMax * 100).ToString("0.##", CultureInfo.InvariantCulture) + "%";
+
+    private static string Invariant(decimal value) => value.ToString("0.##", CultureInfo.InvariantCulture);
+
+    // Short axis labels, ex: 250 000 -> "250k".
+    private static string Compact(decimal value) => value switch
+    {
+        >= 1_000_000 => (value / 1_000_000).ToString("0.#") + "M",
+        >= 1_000 => (value / 1_000).ToString("0.#") + "k",
+        _ => value.ToString("0")
+    };
+
+    private string AriaLabel
+    {
+        get
+        {
+            var last = Points[^1];
+            return $"Bar chart of savings growth over {last.Year} years. After year {last.Year}: " +
+                   $"{last.Invested:N0} kr invested and {last.Returns:N0} kr in returns, {last.Value:N0} kr in total. " +
+                   "A table view is available below.";
+        }
+    }
+}

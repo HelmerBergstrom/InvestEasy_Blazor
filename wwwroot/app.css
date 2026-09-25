@@ -1,3 +1,14 @@
+/* Chart colors, validated for contrast and color blindness on the dark background. */
+:root {
+    --allocation-stocks: #3987e5;
+    --allocation-funds: #d95926;
+    --allocation-low-risk: #199e70;
+
+    /* Saving calculator: invested amount and returns. */
+    --savings-invested: #3987e5;
+    --savings-returns: #199e70;
+}
+
 body {
     background-color: #2c3d57;
 }

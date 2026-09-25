@@ -42,19 +42,21 @@
 
             <p><strong> Profile: </strong> @model.ProfileName </p>
 
+            <AllocationChart Profile="model" />
+
 
             <div class="result-div">
-                <strong> Stocks </strong>
+                <strong><span class="swatch stocks"></span> Stocks </strong>
                 <p>@model.StocksPercentage%</p>
             </div>
 
             <div class="result-div">
-                <strong> Funds </strong>
+                <strong><span class="swatch funds"></span> Funds </strong>
                 <p>@model.FundsPercentage%</p>
             </div>
 
             <div class="result-div">
-                <strong> Low risk / savings </strong>
+                <strong><span class="swatch low-risk"></span> Low risk / savings </strong>
                 <p>@model.MinimalRiskPercentage%</p>
             </div>
 
@@ -87,19 +89,21 @@
 
             <p><strong> Profile: </strong> @savedProfile.ProfileName </p>
 
+            <AllocationChart Profile="savedProfile" />
+
 
             <div class="result-div">
-                <strong> Stocks </strong>
+                <strong><span class="swatch stocks"></span> Stocks </strong>
                 <p> @savedProfile.StocksPercentage% </p>
             </div>
 
             <div class="result-div">
-                <strong> Funds </strong>
+                <strong><span class="swatch funds"></span> Funds </strong>
                 <p> @savedProfile.FundsPercentage% </p>
             </div>
 
             <div class="result-div">
-                <strong> Low risk / savings </strong>
+                <strong><span class="swatch low-risk"></span> Low risk / savings </strong>
                 <p> @savedProfile.MinimalRiskPercentage% </p>
             </div>
         </div>

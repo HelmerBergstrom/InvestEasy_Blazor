@@ -120,3 +120,23 @@
         width: 100%;
     }
 }
+/* Color markers linking each result box to its segment in AllocationChart. */
+.swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 4px;
+    border-radius: 3px;
+}
+
+.swatch.stocks {
+    background: var(--allocation-stocks);
+}
+
+.swatch.funds {
+    background: var(--allocation-funds);
+}
+
+.swatch.low-risk {
+    background: var(--allocation-low-risk);
+}

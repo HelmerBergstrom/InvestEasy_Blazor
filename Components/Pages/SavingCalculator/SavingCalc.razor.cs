@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using InvestEasy.Models;
 using InvestEasy.Services;
@@ -15,6 +16,24 @@ public partial class SavingCalc
     protected string? saveError;
     protected string? saveMessage;
     protected int? editingScenarioId = null;
+    protected string? editingScenarioName;
+
+    // Limits for the inputs, same as the Range-attributes in SavingScenarioModel.
+    protected const int MonthlyMin = 0;
+    protected const int MonthlyMax = 15000;
+    protected const int YearsMin = 1;
+    protected const int YearsMax = 50;
+    protected const int ReturnMin = 0;
+    protected const int ReturnMax = 20;
+
+    // Quick choices for expected annual return.
+    protected record ReturnPreset(string Label, int Percent);
+    protected readonly List<ReturnPreset> returnPresets = new()
+    {
+        new("Cautious", 3),
+        new("Balanced", 5),
+        new("Growth", 8)
+    };
 
     // Model for the EditForm. Saves and binds the input.
     protected SavingScenarioModel model = new()
@@ -27,14 +46,24 @@ public partial class SavingCalc
         UserId = "placeholder"
     };
 
-    protected bool hasCalculated;
     protected decimal futureValue;
     protected decimal totalInvestment;
     protected decimal totalReturn;
 
+    // Value for each year, used by GrowthChart.
+    protected List<GrowthPoint> growth = new();
+
+    // First year where returns are larger than the invested amount, null if never.
+    protected int? breakEvenYear;
+
+    // Share of the final value that comes from returns.
+    protected int ReturnShare => futureValue > 0 ? (int)Math.Round(totalReturn / futureValue * 100) : 0;
+
     // gets all saved scenarios when component is ready to start
     protected override async Task OnInitializedAsync()
     {
+        Recalculate();
+
         var userId = await CurrentUserService.GetUserIdAsync();
 
         if (string.IsNullOrWhiteSpace(userId))
@@ -43,11 +72,15 @@ public partial class SavingCalc
         savedScenarios = await ScenarioService.GetAllScenariosForUser(userId);
     }
 
-    // Calculates users input with the model above and through the calculations in CalculatorService.functions
-    protected void Calculate()
+    // Calculates users input with the model above and through the calculations in CalculatorService.functions.
+    // Runs every time an input changes, so the result is always up to date.
+    protected void Recalculate()
     {
-        hasCalculated = true;
-        saveMessage = null;
+        // Keeps values within limits, ex. if the user types a too large number.
+        model.InitialAmount = Math.Max(0, model.InitialAmount);
+        model.MonthlyAmount = Math.Clamp(model.MonthlyAmount, MonthlyMin, MonthlyMax);
+        model.SavingHorizon = Math.Clamp(model.SavingHorizon, YearsMin, YearsMax);
+        model.ExpectedReturnPercent = Math.Clamp(model.ExpectedReturnPercent, ReturnMin, ReturnMax);
 
         futureValue = CalculatorService.CalculateFutureValue(
             model.MonthlyAmount,
@@ -63,25 +96,43 @@ public partial class SavingCalc
         totalReturn = CalculatorService.CalculateTotalReturn(
             futureValue,
             totalInvestment);
+
+        // Calculates the value at the end of every year for the chart.
+        growth = Enumerable.Range(1, model.SavingHorizon)
+            .Select(year => new GrowthPoint(
+                year,
+                CalculatorService.CalculateTotalInvestment(model.MonthlyAmount, model.InitialAmount, year),
+                CalculatorService.CalculateFutureValue(model.MonthlyAmount, model.InitialAmount, year, model.ExpectedReturnPercent)))
+            .ToList();
+
+        breakEvenYear = growth.FirstOrDefault(p => p.Invested > 0 && p.Returns > p.Invested)?.Year;
     }
+
+    protected void SetReturn(int percent)
+    {
+        model.ExpectedReturnPercent = percent;
+        Recalculate();
+    }
+
+    // How much of a slider track to fill, ex. "35%".
+    protected static string FillPercent(int value, int min, int max) =>
+        ((double)(value - min) / (max - min) * 100).ToString("0.#", CultureInfo.InvariantCulture) + "%";
+
+    // CSS values must use "." as decimal separator regardless of the server culture.
+    protected static string Invariant(decimal value) => value.ToString("0.##", CultureInfo.InvariantCulture);
 
     protected void ClearCalculation()
     {
-        hasCalculated = false;
-
         saveMessage = null;
         saveError = null;
-
-        futureValue = 0;
-        totalInvestment = 0;
-        totalReturn = 0;
-
 
         model.Name = "";
         model.MonthlyAmount = 1000;
         model.InitialAmount = 1000;
         model.SavingHorizon = 5;
         model.ExpectedReturnPercent = 7;
+
+        Recalculate();
     }
 
     // Validates and sends calculation/scenario to SavingScenarioService
@@ -90,12 +141,6 @@ public partial class SavingCalc
     {
         saveError = null;
         saveMessage = null;
-
-        if (!hasCalculated)
-        {
-            saveError = "Use calculation before saving!";
-            return;
-        }
 
         if (string.IsNullOrWhiteSpace(model.Name))
         {
@@ -119,6 +164,8 @@ public partial class SavingCalc
         // GET lastest list
         savedScenarios = await ScenarioService.GetAllScenariosForUser(userId);
 
+        // Resets the form but keeps the message visible.
+        ClearCalculation();
         saveMessage = "Scenario saved.";
     }
 
@@ -136,6 +183,7 @@ public partial class SavingCalc
         }
 
         editingScenarioId = id;
+        editingScenarioName = scenario.Name;
 
         // Sets form values to scenario values
         model.Name = scenario.Name;
@@ -144,7 +192,7 @@ public partial class SavingCalc
         model.SavingHorizon = scenario.SavingHorizon;
         model.ExpectedReturnPercent = scenario.ExpectedReturnPercent;
 
-        hasCalculated = false; // Goes back to form-mode.
+        Recalculate();
     }
 
     // Method to update a specific scenario.
@@ -156,6 +204,12 @@ public partial class SavingCalc
         if (editingScenarioId is null)
         {
             saveError = "No scenario selected for editing.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(model.Name))
+        {
+            saveError = "Please give the scenario a name before saving.";
             return;
         }
 
@@ -181,14 +235,18 @@ public partial class SavingCalc
         // gets saved scenarios again.
         savedScenarios = await ScenarioService.GetAllScenariosForUser(userId);
 
-        saveMessage = "Scenario updated.";
         editingScenarioId = null;
+        editingScenarioName = null;
+
+        ClearCalculation();
+        saveMessage = "Scenario updated.";
     }
 
     // Cancels edit-mode and goes back to normal form
     protected void CancelEdit()
     {
         editingScenarioId = null;
+        editingScenarioName = null;
         ClearCalculation();
     }
 

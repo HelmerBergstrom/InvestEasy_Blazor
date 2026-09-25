@@ -1,0 +1,44 @@
+.allocation-chart {
+    display: flex;
+    gap: 2px;
+    width: 100%;
+    height: 20px;
+    margin: 6px 0 4px 0;
+}
+
+.segment {
+    position: relative;
+    flex-basis: 0;
+    border-radius: 4px;
+}
+
+.segment.stocks {
+    background: var(--allocation-stocks);
+}
+
+.segment.funds {
+    background: var(--allocation-funds);
+}
+
+.segment.low-risk {
+    background: var(--allocation-low-risk);
+}
+
+/* Tooltip on hover showing the segment name and percentage. */
+.segment:hover::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 10px;
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    border-radius: 8px;
+    background: #1e293b;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 700;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1;
+}

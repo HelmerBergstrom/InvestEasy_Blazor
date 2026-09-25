@@ -1,0 +1,30 @@
+@using InvestEasy.Models
+
+@* 100% stacked bar that shows the recommended allocation of a risk profile. *@
+<div class="allocation-chart" role="img" aria-label="@AriaLabel">
+    @foreach (var segment in Segments.Where(s => s.Percentage > 0))
+    {
+        <div class="segment @segment.CssClass"
+             style="flex-grow: @segment.Percentage"
+             data-label="@($"{segment.Label} {segment.Percentage}%")">
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public RiskProfileModel Profile { get; set; } = default!;
+
+    private record Segment(string Label, int Percentage, string CssClass);
+
+    // Same order and colors as the result boxes, which act as the legend.
+    private IEnumerable<Segment> Segments => new[]
+    {
+        new Segment("Stocks", Profile.StocksPercentage, "stocks"),
+        new Segment("Funds", Profile.FundsPercentage, "funds"),
+        new Segment("Low risk / savings", Profile.MinimalRiskPercentage, "low-risk")
+    };
+
+    // Text alternative for screen readers.
+    private string AriaLabel =>
+        "Allocation: " + string.Join(", ", Segments.Select(s => $"{s.Label} {s.Percentage}%"));
+}

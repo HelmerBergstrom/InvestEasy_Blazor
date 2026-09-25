@@ -1,11 +1,7 @@
 @page "/savingcalc"
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
-@using System.Security.Claims
-@using Microsoft.AspNetCore.Components.Authorization
 @attribute [Authorize]
-
-@using BlazorBootstrap
 
 @using InvestEasy.Models
 @using InvestEasy.Services
@@ -14,164 +10,249 @@
 
 <div class="page-header">
     <h1 class="page-title">Saving Calculator</h1>
-    <p class="page-subtitle">Plan, compare and estimate long-term savings with monthly compounding.
-        <br>
-        The calculation assumes monthly compound interest based on stated annual return.
+    <p class="page-subtitle">
+        Plan, compare and estimate long-term savings. Adjust the values and see the result update instantly.
     </p>
 </div>
 
-
-<div class="saving-calc">
+<div class="calc-layout">
 
     @if (editingScenarioId is not null)
     {
-        <div class="alert-editing">
+        <div class="alert-editing" role="status">
             <div>
-                <strong>Edit mode:</strong> You are editing scenario "@model.Name".
-                <br>
-                Update the values and click <strong>Update scenario</strong>.
+                <strong>Edit mode:</strong> You are editing scenario "@editingScenarioName".
+                Adjust the values and click <strong>Update scenario</strong>.
             </div>
-            <button class="btn btn-secondary" type="button" @onclick="CancelEdit">
+            <button class="btn btn-outline" type="button" @onclick="CancelEdit">
                 Exit edit mode
             </button>
         </div>
     }
 
+    <!-- Inputs -->
+    <section class="panel inputs-panel" aria-labelledby="inputs-heading">
+        <h2 id="inputs-heading" class="panel-title"> Your plan </h2>
 
-    <!-- Enhance = false to prevent site reloading. -->
-    <EditForm class="form" Model="@model" OnValidSubmit="Calculate" Enhance="false" FormName="SavingCalculatorForm">
-        <DataAnnotationsValidator />
-
-        <!-- Error-messages in summary (in a list) -->
-        <div class="error-messages">
-            <ValidationSummary />
-        </div>
-
-        <div class="input-group">
+        <div class="field">
             <label for="name"> Scenario name </label>
-            <InputText id="name" class="form-input" @bind-Value="model.Name" />
+            <input id="name" class="form-input" type="text" maxlength="60"
+                   placeholder="Ex: Buffer, House, Retirement"
+                   @bind="model.Name" @bind:event="oninput" />
         </div>
 
-        <div class="input-group">
+        <div class="field">
             <label for="initial"> Initial amount </label>
-            <InputNumber id="initial" class="form-input" @bind-Value="model.InitialAmount" />
+            <div class="input-with-unit">
+                <input id="initial" class="form-input" type="number" min="0" step="1000" inputmode="numeric"
+                       @bind="model.InitialAmount" @bind:after="Recalculate" />
+                <span class="unit" aria-hidden="true"> kr </span>
+            </div>
         </div>
 
-        <div class="input-group">
-            <label for="monthly"> Monthly savings </label>
-            <RangeInput id="monthly" TValue="int" @bind-Value="model.MonthlyAmount" Min="0" Max="15000" Step="500" />
-            <Badge Color="BadgeColor.Primary" visuallyHiddenText="model.MonthlyAmount">
-                @model.MonthlyAmount</Badge>
+        <div class="field">
+            <div class="field-header">
+                <label for="monthly"> Monthly savings </label>
+                <div class="input-with-unit compact">
+                    <input id="monthly" class="form-input" type="number" min="@MonthlyMin" max="@MonthlyMax" step="100" inputmode="numeric"
+                           @bind="model.MonthlyAmount" @bind:after="Recalculate" />
+                    <span class="unit" aria-hidden="true"> kr </span>
+                </div>
+            </div>
+            <input type="range" class="slider" min="@MonthlyMin" max="@MonthlyMax" step="500"
+                   aria-label="Monthly savings slider"
+                   aria-valuetext="@($"{model.MonthlyAmount:N0} kr per month")"
+                   style="--fill: @FillPercent(model.MonthlyAmount, MonthlyMin, MonthlyMax)"
+                   @bind="model.MonthlyAmount" @bind:event="oninput" @bind:after="Recalculate" />
+            <div class="range-scale" aria-hidden="true">
+                <span> @MonthlyMin kr </span>
+                <span> @MonthlyMax.ToString("N0") kr </span>
+            </div>
         </div>
 
-
-        <div class="input-group">
-            <label for="years"> Saving horizon (years)</label>
-            <InputNumber id="years" class="form-input" @bind-Value="model.SavingHorizon" />
+        <div class="field">
+            <div class="field-header">
+                <label for="years"> Saving horizon </label>
+                <div class="input-with-unit compact">
+                    <input id="years" class="form-input" type="number" min="@YearsMin" max="@YearsMax" inputmode="numeric"
+                           @bind="model.SavingHorizon" @bind:after="Recalculate" />
+                    <span class="unit" aria-hidden="true"> years </span>
+                </div>
+            </div>
+            <input type="range" class="slider" min="@YearsMin" max="@YearsMax" step="1"
+                   aria-label="Saving horizon slider"
+                   aria-valuetext="@($"{model.SavingHorizon} years")"
+                   style="--fill: @FillPercent(model.SavingHorizon, YearsMin, YearsMax)"
+                   @bind="model.SavingHorizon" @bind:event="oninput" @bind:after="Recalculate" />
+            <div class="range-scale" aria-hidden="true">
+                <span> @YearsMin year </span>
+                <span> @YearsMax years </span>
+            </div>
         </div>
 
-        <div class="input-group">
-            <label for="return"> Expected annual return (%)</label>
-            <InputNumber id="return" class="form-input" @bind-Value="model.ExpectedReturnPercent" />
+        <div class="field">
+            <div class="field-header">
+                <label for="return"> Expected annual return </label>
+                <div class="input-with-unit compact">
+                    <input id="return" class="form-input" type="number" min="@ReturnMin" max="@ReturnMax" inputmode="numeric"
+                           @bind="model.ExpectedReturnPercent" @bind:after="Recalculate" />
+                    <span class="unit" aria-hidden="true"> % </span>
+                </div>
+            </div>
+            <input type="range" class="slider" min="@ReturnMin" max="@ReturnMax" step="1"
+                   aria-label="Expected annual return slider"
+                   aria-valuetext="@($"{model.ExpectedReturnPercent} percent per year")"
+                   style="--fill: @FillPercent(model.ExpectedReturnPercent, ReturnMin, ReturnMax)"
+                   @bind="model.ExpectedReturnPercent" @bind:event="oninput" @bind:after="Recalculate" />
+
+            <div class="presets" role="group" aria-label="Return presets">
+                @foreach (var preset in returnPresets)
+                {
+                    <button type="button" class="preset @(model.ExpectedReturnPercent == preset.Percent ? "active" : "")"
+                            aria-pressed="@(model.ExpectedReturnPercent == preset.Percent ? "true" : "false")"
+                            @onclick="() => SetReturn(preset.Percent)">
+                        @preset.Label <span class="preset-value">@preset.Percent%</span>
+                    </button>
+                }
+            </div>
         </div>
 
-        <button type="submit" class="btn btn-success"> Calculate </button>
-        <button type="button" class="btn btn-danger" @onclick="ClearCalculation"> Reset form </button>
-    </EditForm>
+        <button type="button" class="btn btn-ghost reset-btn" @onclick="ClearCalculation">
+            Reset values
+        </button>
+    </section>
 
-    <!-- If hasCalculated turns true, display results -->
-    @if (hasCalculated)
-    {
-        <div class="summary">
-            <br>
-            <h3> Summary of scenario "@model.Name" </h3>
-            <p><strong> Initial amount:</strong> @model.InitialAmount </p>
-            <p><strong> Monthly savings:</strong> @model.MonthlyAmount </p>
-            <p><strong> Saving horizon:</strong> @model.SavingHorizon years</p>
-            <p><strong> Expected annual return:</strong> @model.ExpectedReturnPercent%</p>
+    <!-- Results -->
+    <section class="panel results-panel" aria-labelledby="results-heading">
+        <h2 id="results-heading" class="panel-title">
+            @(string.IsNullOrWhiteSpace(model.Name) ? "Your result" : $"Result: {model.Name}")
+        </h2>
+
+        <div class="hero">
+            <p class="hero-label"> Estimated value after @model.SavingHorizon @(model.SavingHorizon == 1 ? "year" : "years") </p>
+            <p class="hero-value"> @futureValue.ToString("N0") <span class="hero-unit">kr</span></p>
         </div>
 
-        <div class="result-box">
-            <h3> Results of scenario "@model.Name" </h3>
-
-            <p><strong> Total investment:</strong> @totalInvestment.ToString("N0")</p>
-            <p><strong> Total returns:</strong> @totalReturn.ToString("N0")</p>
-            <p><strong> Final value (after @model.SavingHorizon years):</strong> @futureValue.ToString("N0")</p>
+        <div class="stat-row">
+            <div class="stat">
+                <span class="stat-label"><span class="swatch invested"></span> Invested </span>
+                <span class="stat-value"> @totalInvestment.ToString("N0") kr </span>
+            </div>
+            <div class="stat">
+                <span class="stat-label"><span class="swatch returns"></span> Returns </span>
+                <span class="stat-value"> @totalReturn.ToString("N0") kr </span>
+                <span class="stat-note"> @ReturnShare% of the final value </span>
+            </div>
         </div>
 
-        <div class="calculation-btns">
+        <GrowthChart Points="growth" />
 
+        @if (breakEvenYear is not null)
+        {
+            <p class="insight">
+                <span aria-hidden="true">✦</span>
+                From <strong>year @breakEvenYear</strong> your returns are larger than everything you have deposited.
+                That is compound interest at work.
+            </p>
+        }
+        else if (model.ExpectedReturnPercent == 0)
+        {
+            <p class="insight">
+                <span aria-hidden="true">✦</span>
+                With 0% return your savings only grow by what you deposit. Try a higher return to see compound interest.
+            </p>
+        }
+
+        <div class="result-actions">
             @if (editingScenarioId is null)
             {
-                <button class="btn btn-success" @onclick="async () => { await SaveScenario(); ClearCalculation(); }">
+                <button class="btn btn-primary-action" type="button" @onclick="SaveScenario">
                     Save scenario
-                </button>
-                <button class="btn btn-danger" @onclick="ClearCalculation" type="button">
-                    Start over
                 </button>
             }
             else
             {
-                <button class="btn btn-warning" @onclick="async () => { await UpdateScenario(); ClearCalculation(); }">
+                <button class="btn btn-primary-action" type="button" @onclick="UpdateScenario">
                     Update scenario
                 </button>
-
-                <button class="btn btn-secondary" type="button" @onclick="CancelEdit">
+                <button class="btn btn-outline" type="button" @onclick="CancelEdit">
                     Cancel edit
                 </button>
             }
         </div>
 
-        @if (!string.IsNullOrWhiteSpace(saveMessage))
-        {
-            <p class="text-success"> @saveMessage </p>
-        }
-        @if (!string.IsNullOrWhiteSpace(saveError))
-        {
-            <p class="text-danger"> @saveError </p>
-        }
-    }
+        <div role="status">
+            @if (!string.IsNullOrWhiteSpace(saveMessage))
+            {
+                <p class="message success"> @saveMessage </p>
+            }
+            @if (!string.IsNullOrWhiteSpace(saveError))
+            {
+                <p class="message error"> @saveError </p>
+            }
+        </div>
 
+        <p class="disclaimer">
+            Assumes monthly deposits and monthly compounding based on the stated annual return. Real returns vary
+            from year to year, and this is not financial advice.
+        </p>
+    </section>
 </div>
 
+<!-- Saved scenarios -->
+@if (editingScenarioId is null)
+{
+    <section class="saved-section" aria-labelledby="saved-heading">
+        <h2 id="saved-heading" class="saved-title"> Saved scenarios </h2>
 
-<div class="saving-calc">
-    @if (savedScenarios.Any() && editingScenarioId is null)
-    {
-        <h2 style="text-align: center;"> Saved scenarios </h2>
-
-        @foreach (SavingScenarioModel s in savedScenarios)
+        @if (!savedScenarios.Any())
         {
-            var futureValue = CalculatorService.CalculateFutureValue(
-            s.MonthlyAmount,
-            s.InitialAmount,
-            s.SavingHorizon,
-            s.ExpectedReturnPercent);
-
-            <br />
-
-            <h3 style="text-align: left;"><strong> @s.Name - @s.CreatedDate </strong></h3>
-            <p><strong> Monthly saving:</strong> @s.MonthlyAmount.ToString(format: "N0") </p>
-            <p><strong> Initial amount:</strong> @s.InitialAmount.ToString(format: "N0") </p>
-            <p><strong> Time horizon:</strong> @s.SavingHorizon years </p>
-            <p><strong> Expected annual return:</strong> @s.ExpectedReturnPercent.ToString(format: "N0")% </p>
-            <p class="final-value-saving"><strong>Final value: @futureValue.ToString("N0")</strong></p>
-
-
-            <div class="calculation-btns-saved">
-                <button class="btn btn-success" type="button" @onclick="() => StartEditScenario(s.Id)">
-                    Edit Scenario
-                </button>
-                <button class="btn btn-danger" type="button" @onclick="() => DeleteScenario(s.Id)">
-                    Delete Scenario
-                </button>
-            </div>
-
+            <p class="empty-state"> No saved scenarios yet. Give your plan a name and click <strong>Save scenario</strong>. </p>
         }
-    }
-    else if (!savedScenarios.Any())
-    {
-        <p> No saved scenarios yet. </p>
-    }
+        else
+        {
+            <ul class="scenario-grid">
+                @foreach (SavingScenarioModel s in savedScenarios)
+                {
+                    var value = CalculatorService.CalculateFutureValue(s.MonthlyAmount, s.InitialAmount, s.SavingHorizon, s.ExpectedReturnPercent);
+                    var invested = CalculatorService.CalculateTotalInvestment(s.MonthlyAmount, s.InitialAmount, s.SavingHorizon);
 
-</div>
+                    <li class="scenario-card">
+                        <div class="scenario-head">
+                            <h3> @s.Name </h3>
+                            <span class="scenario-date"> @s.CreatedDate.ToLocalTime().ToString("yyyy-MM-dd") </span>
+                        </div>
+
+                        <p class="scenario-value"> @value.ToString("N0") kr </p>
+
+                        <div class="mini-bar" aria-hidden="true">
+                            <span class="seg invested" style="flex-grow: @Invariant(invested)"></span>
+                            @if (value > invested)
+                            {
+                                <span class="seg returns" style="flex-grow: @Invariant(value - invested)"></span>
+                            }
+                        </div>
+
+                        <dl class="scenario-facts">
+                            <div><dt> Monthly </dt><dd> @s.MonthlyAmount.ToString("N0") kr </dd></div>
+                            <div><dt> Initial </dt><dd> @s.InitialAmount.ToString("N0") kr </dd></div>
+                            <div><dt> Horizon </dt><dd> @s.SavingHorizon years </dd></div>
+                            <div><dt> Return </dt><dd> @s.ExpectedReturnPercent% </dd></div>
+                        </dl>
+
+                        <div class="scenario-actions">
+                            <button class="btn btn-outline" type="button" aria-label="@($"Edit scenario {s.Name}")"
+                                    @onclick="() => StartEditScenario(s.Id)">
+                                Edit
+                            </button>
+                            <button class="btn btn-danger-outline" type="button" aria-label="@($"Delete scenario {s.Name}")"
+                                    @onclick="() => DeleteScenario(s.Id)">
+                                Delete
+                            </button>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+}
