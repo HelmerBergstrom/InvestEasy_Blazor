@@ -151,7 +151,7 @@ public partial class SavingCalc
         var userId = await CurrentUserService.GetUserIdAsync();
         if (string.IsNullOrWhiteSpace(userId))
         {
-            saveError = "Couldn´t identify user. Log in again.";
+            saveError = "Couldn't identify user. Please log in again.";
             return;
         }
 
@@ -159,7 +159,12 @@ public partial class SavingCalc
         model.UserId = userId;
 
         // Send model to method in SavingScenarioService to CREATE to database.
-        await ScenarioService.CreateScenario(model);
+        var created = await ScenarioService.CreateScenario(model);
+        if (created is null)
+        {
+            saveError = $"You can save up to {SavingScenarioService.MaxScenariosPerUser} scenarios. Delete one to save a new one.";
+            return;
+        }
 
         // GET lastest list
         savedScenarios = await ScenarioService.GetAllScenariosForUser(userId);
@@ -260,7 +265,7 @@ public partial class SavingCalc
         var userId = await CurrentUserService.GetUserIdAsync();
         if (string.IsNullOrWhiteSpace(userId))
         {
-            saveError = "Couldn´t identify user. Please log in again.";
+            saveError = "Couldn't identify user. Please log in again.";
             return;
         }
 
@@ -268,7 +273,7 @@ public partial class SavingCalc
         var deleted = await ScenarioService.DeleteScenario(scenarioId, userId);
         if (!deleted)
         {
-            saveError = "Couldn´t delete the scenario.";
+            saveError = "Couldn't delete the scenario.";
             return;
         }
 

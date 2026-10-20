@@ -1,0 +1,11 @@
+bin/
+obj/
+.git/
+.vscode/
+.DS_Store
+Data/*.db
+Data/*.db-shm
+Data/*.db-wal
+Data/keys/
+Dockerfile
+.dockerignore

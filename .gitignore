@@ -481,8 +481,12 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
-appsettings.json
-appsettings.Development.json
+# appsettings.json holds no secrets. The Finnhub API key is set with user-secrets locally
+# and as an environment variable in production, see README.md.
+appsettings.*.local.json
+
+# Data protection keys created by the app in production.
+Data/keys/
 
 /obj
 /bin

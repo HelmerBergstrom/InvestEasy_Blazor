@@ -1,14 +1,11 @@
-using InvestEasy.Data;
 using InvestEasy.Models;
 using InvestEasy.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore;
 
 namespace InvestEasy.Components.Pages.RiskProfile;
 
 public partial class RiskProfile : ComponentBase
 {
-    [Inject] public ApplicationDbContext DbContext { get; set; } = default!;
     [Inject] public RiskProfileService RiskProfileService { get; set; } = default!;
     [Inject] public CurrentUserService CurrentUserService { get; set; } = default!;
 
@@ -48,8 +45,7 @@ public partial class RiskProfile : ComponentBase
             return;
         }
 
-        savedProfile = await DbContext.RiskProfiles
-        .FirstOrDefaultAsync(x => x.UserId == userId);
+        savedProfile = await RiskProfileService.GetForUserAsync(userId);
     }
 
     // calculates riskprofile via CalculateProfile and user input.
@@ -85,36 +81,7 @@ public partial class RiskProfile : ComponentBase
             return;
         }
 
-        model.UserId = userId;
-
-        // gets existing profile if it exists from db.
-        RiskProfileModel? existingProfile = await DbContext.RiskProfiles
-        .FirstOrDefaultAsync(x => x.UserId == userId);
-
-        // creates profile if user doesn´t have one, overrides current risk profile
-        // if profile exists for user.
-        if (existingProfile is null)
-        {
-            model.CreatedUtc = DateTime.UtcNow;
-            DbContext.RiskProfiles.Add(model);
-        }
-        else
-        {
-            existingProfile.TimeHorizon = model.TimeHorizon;
-            existingProfile.MarketDropReaction = model.MarketDropReaction;
-            existingProfile.ExperienceLevel = model.ExperienceLevel;
-            existingProfile.InvestmentGoal = model.InvestmentGoal;
-
-            existingProfile.TotalScore = model.TotalScore;
-            existingProfile.ProfileName = model.ProfileName;
-
-            existingProfile.StocksPercentage = model.StocksPercentage;
-            existingProfile.FundsPercentage = model.FundsPercentage;
-            existingProfile.MinimalRiskPercentage = model.MinimalRiskPercentage;
-
-            existingProfile.CreatedUtc = DateTime.UtcNow;
-        }
-        await DbContext.SaveChangesAsync();
+        await RiskProfileService.SaveAsync(userId, model);
 
         await LoadSavedRiskProfile();
         ResetRiskProfile();

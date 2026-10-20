@@ -8,6 +8,7 @@
 @inject CurrentUserService CurrentUserService
 @inject MarketService MarketService
 @inject WatchListService WatchListService
+@inject ILogger<WatchList> Logger
 
 <PageTitle> My Watchlist </PageTitle>
 
@@ -206,7 +207,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            Logger.LogWarning(ex, "Stock search failed");
             searchResults = new List<SymbolSearchItem>();
             message = "The search failed. Please try again.";
             messageIsError = true;
@@ -232,15 +233,21 @@
         }
 
         // new watchlist item.
-        bool added = await WatchListService.AddAsync(
+        AddToWatchListResult result = await WatchListService.AddAsync(
         userId,
         item.Symbol ?? "",
         item.Description ?? "",
         item.Type
         );
 
-        message = added ? $"{item.Description} was added to your watchlist." : "That stock is already in your watchlist.";
-        messageIsError = !added;
+        message = result switch
+        {
+            AddToWatchListResult.Added => $"{item.Description} was added to your watchlist.",
+            AddToWatchListResult.AlreadyExists => "That stock is already in your watchlist.",
+            AddToWatchListResult.LimitReached => $"Your watchlist is full. Remove a stock to add a new one (max {WatchListService.MaxItemsPerUser}).",
+            _ => "That stock couldn't be added."
+        };
+        messageIsError = result != AddToWatchListResult.Added;
 
         // reset search UI after adding
         searchQuery = "";

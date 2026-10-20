@@ -107,8 +107,39 @@ summary:focus-visible,
 /* ---------- Layout ---------- */
 
 /* Leaves room for the fixed menu, so no page content ends up under it. */
+/* Keeps the footer at the bottom on short pages. */
+.layout-root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
 .layout-main {
+    flex: 1;
     padding-top: var(--nav-height);
+}
+
+.site-footer {
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.footer-content {
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem;
+    font-size: 0.85rem;
+}
+
+.footer-content p {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.footer-content .footer-brand {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: var(--text-secondary);
 }
 
 .page-container {

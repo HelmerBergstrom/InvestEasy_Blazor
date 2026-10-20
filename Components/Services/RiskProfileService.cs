@@ -1,9 +1,58 @@
-namespace InvestEasy.Services;
-
+using InvestEasy.Data;
 using InvestEasy.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace InvestEasy.Services;
 
 public class RiskProfileService
 {
+    private readonly IDbContextFactory<ApplicationDbContext> _dbFactory;
+
+    public RiskProfileService(IDbContextFactory<ApplicationDbContext> dbFactory)
+    {
+        _dbFactory = dbFactory;
+    }
+
+    // Gets the saved risk profile for a user, null if the user hasn't saved one.
+    public async Task<RiskProfileModel?> GetForUserAsync(string userId)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+
+        return await db.RiskProfiles
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.UserId == userId);
+    }
+
+    // Saves a calculated profile. A user has one profile, so an existing profile is overwritten.
+    public async Task SaveAsync(string userId, RiskProfileModel model)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+
+        RiskProfileModel? profile = await db.RiskProfiles.FirstOrDefaultAsync(x => x.UserId == userId);
+
+        if (profile is null)
+        {
+            profile = new RiskProfileModel { UserId = userId };
+            db.RiskProfiles.Add(profile);
+        }
+
+        profile.TimeHorizon = model.TimeHorizon;
+        profile.MarketDropReaction = model.MarketDropReaction;
+        profile.ExperienceLevel = model.ExperienceLevel;
+        profile.InvestmentGoal = model.InvestmentGoal;
+
+        profile.TotalScore = model.TotalScore;
+        profile.ProfileName = model.ProfileName;
+
+        profile.StocksPercentage = model.StocksPercentage;
+        profile.FundsPercentage = model.FundsPercentage;
+        profile.MinimalRiskPercentage = model.MinimalRiskPercentage;
+
+        profile.CreatedUtc = DateTime.UtcNow;
+
+        await db.SaveChangesAsync();
+    }
+
     public void CalculateProfile(RiskProfileModel model)
     {
         // if horizon is 0(years) = no risk should be taken.

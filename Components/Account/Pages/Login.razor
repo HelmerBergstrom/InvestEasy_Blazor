@@ -39,7 +39,6 @@
                 <InputCheckbox @bind-Value="Input.RememberMe" id="Input.RememberMe" class="form-check-input" />
                 <label class="form-check-label" for="Input.RememberMe">Remember me</label>
             </div>
-            <a href="Account/ForgotPassword">Forgot your password?</a>
         </div>
 
         <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
@@ -55,9 +54,6 @@
     <p>
         New to InvestEasy?
         <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Create an account</a>
-    </p>
-    <p>
-        <a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
     </p>
 </div>
 
@@ -109,10 +105,9 @@
                 return;
             }
 
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+            // Failed attempts count towards account lockout, which protects against password guessing.
             result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure:
-            false);
+            true);
         }
 
         if (result.Succeeded)

@@ -5,6 +5,7 @@
 @attribute [Authorize]
 @inject UserProgressService UserProgressService
 @inject CurrentUserService CurrentUserService
+@inject ILogger<Education> Logger
 
 <PageTitle>Academy</PageTitle>
 
@@ -152,7 +153,8 @@
         }
         catch (Exception ex)
         {
-            errorMessage = ex.Message;
+            Logger.LogError(ex, "Couldn't load academy progress");
+            errorMessage = "Couldn't load your progress right now. Please try again later.";
         }
     }
 }
