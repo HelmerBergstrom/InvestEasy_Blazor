@@ -1,14 +1,18 @@
 @page "/Account/RegisterConfirmation"
 
-@inject IdentityRedirectManager RedirectManager
+<PageTitle>Confirm your email</PageTitle>
 
-@* Accounts don't need email confirmation (RequireConfirmedAccount is false), so registration never ends here.
-   The scaffolded page showed a confirmation link for any email address when no email sender is configured,
-   which let anyone check which emails have accounts, so it now only redirects to the home page. *@
+<PageHeader Title="Check your email" Icon="bi-envelope-check" Eyebrow="Almost done">
+    We have sent a confirmation link to your email address. Open it to activate your account, then log in.
+</PageHeader>
 
-@code {
-    protected override void OnInitialized()
-    {
-        RedirectManager.RedirectTo("");
-    }
-}
+@* The page shows the same text for every visitor, so it can't be used to find out which emails have accounts. *@
+<section class="panel">
+    <p>
+        The email can take a minute to arrive. If you can't find it, check your spam folder.
+    </p>
+    <div class="account-actions">
+        <a class="btn btn-primary-action" href="Account/Login">Go to log in</a>
+        <a class="btn btn-outline" href="Account/ResendEmailConfirmation">Send the email again</a>
+    </div>
+</section>

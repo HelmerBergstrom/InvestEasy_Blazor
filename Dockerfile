@@ -21,6 +21,10 @@ VOLUME /app/Data
 
 USER $APP_UID
 ENV ASPNETCORE_HTTP_PORTS=8080
+
+# Hosting platforms run containers behind a proxy that handles HTTPS. This makes the app trust the
+# proxy's X-Forwarded-For/Proto headers. Remove it if the container is exposed directly to the internet.
+ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
 EXPOSE 8080
 
 ENTRYPOINT ["dotnet", "InvestEasy.dll"]

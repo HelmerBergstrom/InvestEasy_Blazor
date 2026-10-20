@@ -10,8 +10,14 @@
 
 <PageTitle>Confirm email</PageTitle>
 
-<h1>Confirm email</h1>
-<StatusMessage Message="@statusMessage" />
+<PageHeader Title="Confirm email" Icon="bi-envelope-check" Eyebrow="Account" />
+
+<section class="panel">
+    <StatusMessage Message="@statusMessage" />
+    <div class="account-actions">
+        <a class="btn btn-primary-action" href="Account/Login">Go to log in</a>
+    </div>
+</section>
 
 @code {
     private string? statusMessage;
@@ -34,16 +40,33 @@
         }
 
         var user = await UserManager.FindByIdAsync(UserId);
-        if (user is null)
+        if (user is null || !TryDecode(Code, out var code))
         {
-            HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-            statusMessage = $"Error loading user with ID {UserId}";
+            HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            statusMessage = InvalidLinkMessage;
+            return;
         }
-        else
+
+        var result = await UserManager.ConfirmEmailAsync(user, code);
+        statusMessage = result.Succeeded
+            ? "Thank you for confirming your email. You can now log in."
+            : InvalidLinkMessage;
+    }
+
+    private const string InvalidLinkMessage = "Error: This confirmation link is invalid or has expired. Log in or ask for a new confirmation email.";
+
+    // The code comes from a link and may have been changed, so a broken code is treated as an invalid link.
+    private static bool TryDecode(string value, out string code)
+    {
+        try
         {
-            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(Code));
-            var result = await UserManager.ConfirmEmailAsync(user, code);
-            statusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
+            code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(value));
+            return true;
+        }
+        catch (FormatException)
+        {
+            code = "";
+            return false;
         }
     }
 }

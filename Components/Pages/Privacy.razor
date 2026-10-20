@@ -1,0 +1,65 @@
+@page "/privacy"
+@inject IConfiguration Configuration
+
+<PageTitle> Privacy </PageTitle>
+
+<PageHeader Title="Privacy policy" Icon="bi-shield-lock" Eyebrow="About" Width="narrow">
+    What InvestEasy stores about you, why, and how you can see or delete it.
+</PageHeader>
+
+<div class="page-container narrow">
+    <section class="panel privacy">
+        <h2> What we store </h2>
+        <p> If you create an account, InvestEasy stores: </p>
+        <ul>
+            <li> Your email address and a hashed version of your password (the password itself is never stored). </li>
+            <li> Security settings you turn on, such as two-factor authentication and passkeys. </li>
+            <li> What you save in the app: saving scenarios, your watchlist, your academy progress and your risk profile. </li>
+        </ul>
+        <p> You can use the market pages without an account, and then nothing is stored about you. </p>
+
+        <h2> Why </h2>
+        <p>
+            The data is only used to give you the features of your account, such as logging in, resetting your
+            password and showing what you have saved. It is not sold, shared for marketing or used for tracking.
+        </p>
+
+        <h2> Cookies </h2>
+        <p>
+            InvestEasy only uses cookies that are needed for the site to work: one that keeps you logged in and
+            one that protects forms against forged requests. There are no analytics or advertising cookies.
+        </p>
+
+        <h2> Other services </h2>
+        <ul>
+            <li> Market data comes from <a href="https://finnhub.io" target="_blank" rel="noopener noreferrer">Finnhub</a>. No information about you is sent to Finnhub. </li>
+            <li> Images in the market news are loaded directly from the news sites, and the icons from jsDelivr, so those services can see your IP address. </li>
+            <li> Account emails (confirmation and password reset) are sent through an email provider. </li>
+        </ul>
+
+        <h2> How long </h2>
+        <p> Your data is kept until you delete your account. Deleting the account removes all of it. </p>
+
+        <h2> Your rights </h2>
+        <p>
+            Under GDPR you can see, correct, download and delete your data. When you are logged in, go to
+            <a href="Account/Manage/PersonalData">your account → Personal data</a> to download or delete everything.
+            You can also complain to the Swedish Authority for Privacy Protection (IMY).
+        </p>
+
+        @if (!string.IsNullOrWhiteSpace(contactEmail))
+        {
+            <h2> Contact </h2>
+            <p> Questions about your data: <a href="mailto:@contactEmail">@contactEmail</a> </p>
+        }
+    </section>
+</div>
+
+@code {
+    private string? contactEmail;
+
+    protected override void OnInitialized()
+    {
+        contactEmail = Configuration["Site:ContactEmail"];
+    }
+}

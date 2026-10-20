@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 using InvestEasy.Components.Account.Pages;
 using InvestEasy.Components.Account.Pages.Manage;
@@ -114,6 +115,7 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
         manageGroup.MapPost("/DownloadPersonalData", async (
             HttpContext context,
             [FromServices] UserManager<ApplicationUser> userManager,
+            [FromServices] ApplicationDbContext db,
             [FromServices] AuthenticationStateProvider authenticationStateProvider) =>
         {
             var user = await userManager.GetUserAsync(context.User);
@@ -126,7 +128,7 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
             downloadLogger.LogInformation("User with ID '{UserId}' asked for their personal data.", userId);
 
             // Only include personal data for download
-            var personalData = new Dictionary<string, string>();
+            var personalData = new Dictionary<string, object?>();
             var personalDataProps = typeof(ApplicationUser).GetProperties().Where(
                 prop => Attribute.IsDefined(prop, typeof(PersonalDataAttribute)));
             foreach (var p in personalDataProps)
@@ -141,7 +143,14 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
             }
 
             personalData.Add("Authenticator Key", (await userManager.GetAuthenticatorKeyAsync(user))!);
-            var fileBytes = JsonSerializer.SerializeToUtf8Bytes(personalData);
+
+            // Everything the user has saved in the app.
+            personalData.Add("Saving scenarios", await db.SavingScenarios.AsNoTracking().Where(x => x.UserId == userId).ToListAsync());
+            personalData.Add("Watchlist", await db.WatchListItems.AsNoTracking().Where(x => x.UserId == userId).ToListAsync());
+            personalData.Add("Academy progress", await db.UserProgresses.AsNoTracking().Where(x => x.UserId == userId).ToListAsync());
+            personalData.Add("Risk profile", await db.RiskProfiles.AsNoTracking().Where(x => x.UserId == userId).ToListAsync());
+
+            var fileBytes = JsonSerializer.SerializeToUtf8Bytes(personalData, new JsonSerializerOptions { WriteIndented = true });
 
             context.Response.Headers.TryAdd("Content-Disposition", "attachment; filename=PersonalData.json");
             return TypedResults.File(fileBytes, contentType: "application/json", fileDownloadName: "PersonalData.json");

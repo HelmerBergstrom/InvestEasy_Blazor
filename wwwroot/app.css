@@ -868,6 +868,13 @@ ul.validation-errors {
     background: var(--border);
 }
 
+.account-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
 .account-links {
     margin-top: 1.5rem;
     text-align: center;
@@ -930,4 +937,20 @@ ul.validation-errors {
     flex-wrap: wrap;
     gap: 0.75rem;
     margin-top: 1.5rem;
+}
+
+/* ---------- Privacy page ---------- */
+
+.privacy h2 {
+    font-size: 1.15rem;
+    margin: 1.75rem 0 0.5rem 0;
+}
+
+.privacy h2:first-child {
+    margin-top: 0;
+}
+
+.privacy li {
+    color: var(--text-secondary);
+    margin-bottom: 0.35rem;
 }

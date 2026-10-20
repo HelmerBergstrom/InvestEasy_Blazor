@@ -11,9 +11,14 @@
 
 <PageTitle>Confirm email change</PageTitle>
 
-<h1>Confirm email change</h1>
+<PageHeader Title="Confirm email change" Icon="bi-envelope-check" Eyebrow="Account" />
 
-<StatusMessage Message="@message" />
+<section class="panel">
+    <StatusMessage Message="@message" />
+    <div class="account-actions">
+        <a class="btn btn-primary-action" href="Account/Manage">Go to your account</a>
+    </div>
+</section>
 
 @code {
     private string? message;
@@ -42,11 +47,22 @@
         var user = await UserManager.FindByIdAsync(UserId);
         if (user is null)
         {
-            message = "Unable to find user with Id '{userId}'";
+            message = "Error: This link is invalid or has expired.";
             return;
         }
 
-        var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(Code));
+        string code;
+        try
+        {
+            code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(Code));
+        }
+        catch (FormatException)
+        {
+            // The code comes from a link and may have been changed.
+            message = "Error changing email.";
+            return;
+        }
+
         var result = await UserManager.ChangeEmailAsync(user, Email, code);
         if (!result.Succeeded)
         {

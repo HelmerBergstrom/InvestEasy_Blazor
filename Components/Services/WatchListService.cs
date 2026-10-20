@@ -73,7 +73,16 @@ public class WatchListService
         };
 
         db.WatchListItems.Add(item);
-        await db.SaveChangesAsync();
+
+        try
+        {
+            await db.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            // The unique index on (UserId, Symbol) stopped a duplicate, ex. after a double click.
+            return AddToWatchListResult.AlreadyExists;
+        }
 
         return AddToWatchListResult.Added;
     }

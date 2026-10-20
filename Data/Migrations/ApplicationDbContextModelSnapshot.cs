@@ -15,7 +15,7 @@ namespace InvestEasy.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.3");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.12");
 
             modelBuilder.Entity("InvestEasy.Data.ApplicationUser", b =>
                 {
@@ -88,9 +88,6 @@ namespace InvestEasy.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("TEXT");
 
@@ -128,7 +125,8 @@ namespace InvestEasy.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("RiskProfiles");
                 });
@@ -138,9 +136,6 @@ namespace InvestEasy.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("TEXT");
@@ -167,7 +162,7 @@ namespace InvestEasy.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("SavingScenarios");
                 });
@@ -177,9 +172,6 @@ namespace InvestEasy.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("TEXT");
 
                     b.Property<int>("CurrentLevel")
                         .HasColumnType("INTEGER");
@@ -199,7 +191,8 @@ namespace InvestEasy.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("UserProgresses");
                 });
@@ -209,9 +202,6 @@ namespace InvestEasy.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("TEXT");
@@ -233,7 +223,8 @@ namespace InvestEasy.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("UserId", "Symbol")
+                        .IsUnique();
 
                     b.ToTable("WatchListItems");
                 });
@@ -391,28 +382,36 @@ namespace InvestEasy.Migrations
                 {
                     b.HasOne("InvestEasy.Data.ApplicationUser", null)
                         .WithMany("RiskProfiles")
-                        .HasForeignKey("ApplicationUserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("InvestEasy.Models.SavingScenarioModel", b =>
                 {
                     b.HasOne("InvestEasy.Data.ApplicationUser", null)
                         .WithMany("SavingScenarios")
-                        .HasForeignKey("ApplicationUserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("InvestEasy.Models.UserProgressModel", b =>
                 {
                     b.HasOne("InvestEasy.Data.ApplicationUser", null)
                         .WithMany("UserProgresses")
-                        .HasForeignKey("ApplicationUserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("InvestEasy.Models.WatchListItemModel", b =>
                 {
                     b.HasOne("InvestEasy.Data.ApplicationUser", null)
                         .WithMany("WatchListItems")
-                        .HasForeignKey("ApplicationUserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

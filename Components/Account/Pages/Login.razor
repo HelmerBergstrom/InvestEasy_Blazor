@@ -39,6 +39,7 @@
                 <InputCheckbox @bind-Value="Input.RememberMe" id="Input.RememberMe" class="form-check-input" />
                 <label class="form-check-label" for="Input.RememberMe">Remember me</label>
             </div>
+            <a href="Account/ForgotPassword">Forgot your password?</a>
         </div>
 
         <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
@@ -54,6 +55,9 @@
     <p>
         New to InvestEasy?
         <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Create an account</a>
+    </p>
+    <p>
+        Didn't get the confirmation email? <a href="Account/ResendEmailConfirmation">Send it again</a>
     </p>
 </div>
 
@@ -128,7 +132,9 @@
         }
         else
         {
-            errorMessage = "Error: Invalid login attempt.";
+            // NotAllowed means the email isn't confirmed. The message is the same as for a wrong password,
+            // so it doesn't reveal which emails have accounts.
+            errorMessage = "Error: Invalid login attempt. If you just created your account, confirm your email first.";
         }
     }
 

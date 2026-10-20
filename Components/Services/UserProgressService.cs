@@ -106,7 +106,17 @@ public class UserProgressService
         };
 
         db.UserProgresses.Add(progress);
-        await db.SaveChangesAsync();
+
+        try
+        {
+            await db.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            // Another request created the progress at the same time (UserId is unique), so that one is used.
+            db.Entry(progress).State = EntityState.Detached;
+            return await db.UserProgresses.FirstAsync(x => x.UserId == userId);
+        }
 
         return progress;
     }

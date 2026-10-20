@@ -9,3 +9,4 @@ Data/*.db-wal
 Data/keys/
 Dockerfile
 .dockerignore
+tests/

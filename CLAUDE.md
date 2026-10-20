@@ -13,18 +13,21 @@ dotnet restore
 dotnet build
 dotnet watch run                               # dev server with hot reload
 dotnet ef database update                      # apply migrations manually (the app also migrates on startup)
-dotnet ef migrations add <Name> -o Data/Migrations
+dotnet ef migrations add <Name> -o Data/Migrations --project InvestEasy.csproj
+dotnet test                                    # xUnit tests in tests/InvestEasy.Tests
 ```
 
-There is no test project and no linter configured.
+Tests use an in-memory SQLite database with the real migrations (`TestDatabase`), so foreign keys and unique indexes are enforced. The web project excludes `tests/**` from compilation. CI (`.github/workflows/ci.yml`) builds and tests on push. There is no linter.
 
 ## Configuration
 
-`appsettings.json` is committed and holds no secrets. `Finnhub:ApiKey` is set with `dotnet user-secrets` locally and as the environment variable `Finnhub__ApiKey` in production. Without it the app still runs, but market data is unavailable and a warning is logged at startup.
+`appsettings.json` is committed and holds no secrets. `Finnhub:ApiKey` and `Email:Password` are set with `dotnet user-secrets` locally and as environment variables (`Finnhub__ApiKey`, `Email__Password`) in production. Without a Finnhub key the app runs but market data is unavailable.
+
+Email (`Email:*`, `Services/Email/`): `SmtpEmailSender` (MailKit) is used when `Email:Host` and `Email:FromAddress` are set. Without them, `DevelopmentEmailSender` logs the links in development, and the app throws at startup in other environments, because `RequireConfirmedAccount` is true. `AllowedHosts` must be the real domain in production, since email links are built from the request host.
 - `ConnectionStrings:DefaultConnection`: `DataSource=Data/app.db;Cache=Shared`
 - `Finnhub:BaseUrl` (`https://finnhub.io/api/v1/`) and `Finnhub:ApiKey`
 
-`Program.cs` creates the database folder, runs `Database.Migrate()` on startup and stores data protection keys in `Data/keys/`. `*.db` files and `Data/keys/` are gitignored. Deployment (Dockerfile, persistent `Data/` folder, `/health`) is described in README.md.
+`Program.cs` creates the database folder, runs `Database.Migrate()` on startup, stores data protection keys in `Data/keys/`, sets security headers (including a Content Security Policy: scripts only from 'self'), and rate limits POSTs to `/Account/*` per IP (passkey option calls have their own limit). `*.db` files and `Data/keys/` are gitignored. Deployment (Dockerfile, persistent `Data/` folder, `/health`) is described in README.md.
 
 ## Architecture
 
@@ -35,10 +38,11 @@ There is no test project and no linter configured.
   - `WatchListService` and `SavingScenarioService` cap items per user (20 and 50).
   - `CurrentUserService.GetUserIdAsync()` is how pages get the current user's Identity id (`ClaimTypes.NameIdentifier`). Every user-owned entity is filtered by `UserId`.
   - `ICalculatorService`/`CalculatorService` is pure compound-interest math with monthly compounding and no dependencies.
-- **Data:** `ApplicationDbContext` extends `IdentityDbContext<ApplicationUser>`. The entity classes are in `Components/Models/Entities/` but use the namespace `InvestEasy.Models` and the suffix `*Model`, for example `WatchListItemModel`. `ApplicationUser` holds navigation collections to them. Finnhub DTOs are in `Components/Models/Dtos/`.
+- **Data:** `ApplicationDbContext` extends `IdentityDbContext<ApplicationUser>`. `OnModelCreating` makes `UserId` the foreign key to the user with cascade delete, and adds unique indexes (watchlist `UserId`+`Symbol`, one progress and one risk profile per user). Services catch `DbUpdateException` from those indexes. The entity classes are in `Components/Models/Entities/` but use the namespace `InvestEasy.Models` and the suffix `*Model`, for example `WatchListItemModel`. `ApplicationUser` holds navigation collections to them. Finnhub DTOs are in `Components/Models/Dtos/`.
 - **Pages** are grouped by feature under `Components/Pages/`: `Market/` (Indexes, News, Stocks and WatchList, with a shared `MarketMenu`), `SavingCalculator/`, `RiskProfile/` and `Education/`. Larger pages move their logic into a code-behind partial class (`*.razor.cs` or `RiskProfile.cs`). Styling uses scoped `*.razor.css` files plus `wwwroot/app.css`, together with Bootstrap 5 (CSS only, from `wwwroot/lib`) and Bootstrap Icons from a CDN.
 - **Education levels:** each level has a routed wrapper page (`LevelN.razor`) and a static content component (`LevelNContent.razor`). Unlocking is stored in `UserProgressModel` as `CurrentLevel` plus the flags `Level1Completed` to `Level3Completed`, and the flags are hard-coded in `UserProgressService.CompleteLevelAsync`. Adding a level means changing the entity, adding a migration and updating that switch. `CompleteLevelAsync` refuses locked levels, and each `LevelN.razor` redirects to `/education` if the level is locked.
-- `Components/Account/` is the scaffolded ASP.NET Identity UI. Leave it mostly untouched. There is no email sender (`IdentityNoOpEmailSender`), so the links to password reset and resend confirmation are removed, and `RegisterConfirmation` only redirects home. Login uses `lockoutOnFailure: true`.
+- `Components/Account/` is the scaffolded ASP.NET Identity UI. Leave it mostly untouched. The email pages (forgot/reset password, confirm, resend) are restyled with `PageHeader` and panels, never reveal whether an email has an account, and treat broken codes in links as invalid links. Login uses `lockoutOnFailure: true`. `DownloadPersonalData` also exports the user's app data.
+- `Components/Pages/Privacy.razor` is the privacy policy (contact from `Site:ContactEmail`), linked from the footer and the register page.
 
 ## Conventions
 

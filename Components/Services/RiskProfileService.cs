@@ -24,7 +24,9 @@ public class RiskProfileService
     }
 
     // Saves a calculated profile. A user has one profile, so an existing profile is overwritten.
-    public async Task SaveAsync(string userId, RiskProfileModel model)
+    public Task SaveAsync(string userId, RiskProfileModel model) => SaveAsync(userId, model, retryOnConflict: true);
+
+    private async Task SaveAsync(string userId, RiskProfileModel model, bool retryOnConflict)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
 
@@ -50,7 +52,15 @@ public class RiskProfileService
 
         profile.CreatedUtc = DateTime.UtcNow;
 
-        await db.SaveChangesAsync();
+        try
+        {
+            await db.SaveChangesAsync();
+        }
+        catch (DbUpdateException) when (retryOnConflict && db.Entry(profile).State == EntityState.Added)
+        {
+            // Another request saved a profile at the same time (UserId is unique). Saves once more as an update.
+            await SaveAsync(userId, model, retryOnConflict: false);
+        }
     }
 
     public void CalculateProfile(RiskProfileModel model)
